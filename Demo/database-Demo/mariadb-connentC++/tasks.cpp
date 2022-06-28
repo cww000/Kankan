@@ -21,7 +21,7 @@ void deleteTask(std::unique_ptr<sql::Connection> &conn, int id) {
 void updateTaskStatus(std::unique_ptr<sql::Connection> &conn, int id, bool completed) {
     try {
         // Create a new PreparedStatement
-        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement("update tasks set completed = ? where id = ?"));
+        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement("update tasks set comleted = ? where id = ?"));
         // Bind values to SQL statement
         stmnt->setBoolean(1, completed);
         stmnt->setInt(2, id);
@@ -37,7 +37,7 @@ void updateTaskStatus(std::unique_ptr<sql::Connection> &conn, int id, bool compl
 void addTask(std::unique_ptr<sql::Connection> &conn, std::string description) {
     try {
         // Create a new PreparedStatement
-        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement("insert into tasks (description) values (?)"));
+        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement("insert into tasks values ()"));
         // Bind values to SQL statement
         stmnt->setString(1, description);
         // Execute query
