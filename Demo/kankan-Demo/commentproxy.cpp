@@ -4,3 +4,8 @@ CommentProxy::CommentProxy()
 {
 
 }
+
+CommentProxy::~CommentProxy()
+{
+
+}

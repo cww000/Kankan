@@ -5,8 +5,8 @@
 class NetizenInterface
 {
 public:
-    NetizenInterface();
-    virtual ~NetizenInterface();
+    NetizenInterface(){};
+    virtual ~NetizenInterface(){};
 };
 
 #endif // NETIZENINTERFACE_H

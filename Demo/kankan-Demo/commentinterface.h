@@ -5,8 +5,8 @@
 class CommentInterface
 {
 public:
-    CommentInterface();
-    virtual ~CommentInterface();
+    CommentInterface(){};
+    virtual ~CommentInterface(){};
 };
 
 #endif // COMMENTINTERFACE_H

@@ -10,3 +10,8 @@ void VideoProxy::getVideoInfo()
 {
 
 }
+
+VideoProxy::~VideoProxy()
+{
+
+}

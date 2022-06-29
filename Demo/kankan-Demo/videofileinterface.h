@@ -5,8 +5,8 @@
 class VideoFileInterface
 {
 public:
-    VideoFileInterface();
-    virtual ~VideoFileInterface();
+    VideoFileInterface(){};
+    virtual ~VideoFileInterface(){};
 };
 
 #endif // VIDEOFILEINTERFACE_H

@@ -14,6 +14,10 @@ class Netizen
 public:
     Netizen(long id, std::string key);
 
+    //创造insert的sql语句
+    std::string insertSql();
+
+
     //获取用户id,昵称，所有的稿件id，粉丝的id，关注者的id
     //id:用户id
     //nickname:用户昵称

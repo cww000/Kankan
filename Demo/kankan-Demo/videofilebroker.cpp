@@ -2,6 +2,11 @@
 
 VideoFileBroker* VideoFileBroker::m_videoFileBroker = nullptr;
 
+VideoFileBroker::~VideoFileBroker()
+{
+
+}
+
 VideoFileBroker::VideoFileBroker()
 {
 

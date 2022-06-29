@@ -4,3 +4,8 @@ VideoFile::VideoFile()
 {
 
 }
+
+VideoFile::~VideoFile()
+{
+
+}

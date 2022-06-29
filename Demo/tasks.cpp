@@ -2,19 +2,37 @@
 #include <cstring>
 #include <mariadb/conncpp.hpp>
 
+// Create a new task record
+void addTask(std::unique_ptr<sql::Connection> &conn, std::string description) {
+    try {
+        // Create a new PreparedStatement
+        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement("insert into use  values (1,2,'哈哈哈')"));
+
+        // Bind values to SQL statement
+       // stmnt->setString(1, description);
+        // Execute query
+        stmnt->executeQuery();
+    }
+    catch(sql::SQLException& e){
+      std::cerr << "Error inserting new task: " << e.what() << std::endl;
+   }
+}
+
 // Print all records in tasks table 
 void showTasks(std::unique_ptr<sql::Connection> &conn) {
     try {
-    	std::cout << "xiaosowo" << std::endl;
         // Create a new Statement
         std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
         // Execute query
         sql::ResultSet *res = stmnt->executeQuery("select * from user;");
         // Loop through and print results
         while (res->next()) {
-            std::cout << "id = " << res->getInt(1);
-            std::cout << ", key = " << res->getString(2);
-            std::cout << ", nickname = " << res->getString(3) << "\n";
+            std::wcout << "id = " << res->getInt(1);
+            std::wcout << ", key = " << res->getString(2);
+            //std::cout << ", type = " << res->getType();
+            std::wcout << ", nickname = " << res->getString(3) 
+            //std::cout << ", type = " << res->getType() 
+	    << "\n";
         }
     }
     catch(sql::SQLException& e){
@@ -41,8 +59,13 @@ int main(int argc, char **argv){
 
             // Use arguments to determine execution next steps
             if (!strcmp(argv[1],"showTasks")) {
-            	std::cout << "1" << std::endl;
                 showTasks(conn);
+            } else if (!strcmp(argv[1],"addTask")) {
+                if (argc != 3) {
+                    std::cout << "Invalid arguments";
+                    return 1;
+                }
+                addTask(conn, argv[2]);
             }
 
             // Close Connection

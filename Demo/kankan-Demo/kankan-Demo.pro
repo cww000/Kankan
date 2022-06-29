@@ -3,6 +3,8 @@ CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
+LIBS += -lmariadbcpp
+
 SOURCES += \
         cache.cpp \
         comment.cpp \

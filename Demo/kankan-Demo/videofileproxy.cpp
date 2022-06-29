@@ -4,3 +4,8 @@ VideoFileProxy::VideoFileProxy()
 {
 
 }
+
+VideoFileProxy::~VideoFileProxy()
+{
+
+}

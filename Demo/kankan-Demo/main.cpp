@@ -1,9 +1,14 @@
 #include <iostream>
+#include "videosocialcontrol.h"
 
 using namespace std;
 
 int main()
 {
-    cout << "Hello World!" << endl;
+    VideoSocialControl control;
+    control.login(20220628, "zhuyoucheng");
+
+    control.login("lwc");
+
     return 0;
 }

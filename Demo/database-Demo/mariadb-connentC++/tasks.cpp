@@ -37,7 +37,7 @@ void updateTaskStatus(std::unique_ptr<sql::Connection> &conn, int id, bool compl
 void addTask(std::unique_ptr<sql::Connection> &conn, std::string description) {
     try {
         // Create a new PreparedStatement
-        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement("insert into tasks values ()"));
+        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement("insert into tasks (description) values (?)"));
         // Bind values to SQL statement
         stmnt->setString(1, description);
         // Execute query
@@ -48,10 +48,10 @@ void addTask(std::unique_ptr<sql::Connection> &conn, std::string description) {
    }
 }
 
+
 // Print all records in tasks table 
 void showTasks(std::unique_ptr<sql::Connection> &conn) {
     try {
-    	std::cout << "xiaosowo" << std::endl;
         // Create a new Statement
         std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
         // Execute query
@@ -88,7 +88,6 @@ int main(int argc, char **argv){
 
             // Use arguments to determine execution next steps
             if (!strcmp(argv[1],"showTasks")) {
-            	std::cout << "1" << std::endl;
                 showTasks(conn);
             }
             else if (!strcmp(argv[1],"addTask")) {

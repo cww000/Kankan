@@ -7,3 +7,8 @@ Video::Video(std::string id, std::string description, std::string title,
 {
 
 }
+
+Video::~Video()
+{
+
+}
