@@ -11,8 +11,11 @@ class CommentProxy : public CommentInterface
 public:
     CommentProxy();
     ~CommentProxy();
+
+    //返回评论的内容
+    std::string getCommentInfo(std::string id);
 private:
-    std::shared_ptr<Comment> m_Comment;
+    std::shared_ptr<Comment> m_comment;
 };
 
 #endif // COMMENTPROXY_H

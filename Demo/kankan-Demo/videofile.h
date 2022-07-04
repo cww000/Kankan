@@ -8,10 +8,14 @@
 class VideoFile : public VideoFileInterface
 {
 public:
-    VideoFile();
+    VideoFile(std::string id, std::string duration, std::string address);
     ~VideoFile();
+    std::string getDuration(){ return m_duration; };
+    //返回视频的时长
+
 private:
-    std::string m_id;
+    std::string m_id;           //
+    std::string m_duration;     //视频时长
     std::string m_address;
 };
 

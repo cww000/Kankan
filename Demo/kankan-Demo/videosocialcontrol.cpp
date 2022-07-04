@@ -2,6 +2,7 @@
 #include "netizen.h"
 #include "netizenbroker.h"
 #include <iostream>
+#include <utility>
 
 VideoSocialControl::VideoSocialControl()
 {
@@ -36,7 +37,31 @@ void VideoSocialControl::login(long id, std::string key)
         std::cout << "用户不存在" << std::endl;
     }
 
-    auto nitizen = NetizenBroker::getInstance()->findNetizenById(id);
+    auto netizen = NetizenBroker::getInstance()->findNetizenById(id);
+    netizen->init();//初始化稿件（含视频）、粉丝列表、关注列表初始化
+}
+
+void VideoSocialControl::getSomeVideos(std::vector<std::string> ids)
+{
+    std::unordered_map<std::string, VideoProxy> _videos;
+    for (auto id : ids)
+        _videos.insert(std::make_pair(id, VideoProxy(id)));
+
+    //通过数据库检索找到对应稿件的netizen
+
+
+    //获取稿件的摘要信息
+    for (auto video : _videos)
+        video.second.getVideoInfo(video.first);
+
+    //整合网民信息与稿件的摘要信息
+
+}
+
+
+void VideoSocialControl::loadVidoe(std::string id)
+{
+
 }
 
 
