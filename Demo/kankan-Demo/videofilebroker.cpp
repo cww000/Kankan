@@ -14,7 +14,7 @@ VideoFileBroker *VideoFileBroker::getInstance()
     return m_videoFileBroker;
 }
 
-VideoFile *VideoFileBroker::getVideoFile()
+std::shared_ptr<VideoFile> VideoFileBroker::getVideoFile(std::string &id)
 {
     //检查是否存在缓存中
 

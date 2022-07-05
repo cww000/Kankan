@@ -27,11 +27,11 @@ RelationalBroker::~RelationalBroker()
     conn->close();
 }
 
-sql::ResultSet* RelationalBroker::query(std::string sql)
+std::shared_ptr<sql::ResultSet> RelationalBroker::query(std::string sql)
 {
     try {
         std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
-        sql::ResultSet* res = stmnt->executeQuery(sql);
+        std::shared_ptr<sql::ResultSet> res(stmnt->executeQuery(sql));
         return res;
     } catch (sql::SQLException& e) {
         std::cerr << "Error selecting sql: " << e.what() << std::endl;

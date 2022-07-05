@@ -14,7 +14,7 @@ CommentBroker *CommentBroker::getInstance()
     return m_commentBroker;
 }
 
-Comment *CommentBroker::getComment(std::string &id)
+std::shared_ptr<Comment> CommentBroker::getComment(std::string &id)
 {
     //判断是否存在缓存中
 

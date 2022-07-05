@@ -9,7 +9,7 @@ class CommentBroker
 public:
     ~CommentBroker();
     static CommentBroker* getInstance();
-    Comment* getComment(std::string& id);
+    std::shared_ptr<Comment> getComment(std::string& id);
 private:
     CommentBroker();
     static CommentBroker* m_commentBroker;

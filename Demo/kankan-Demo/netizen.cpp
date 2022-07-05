@@ -2,11 +2,11 @@
 #include <string>
 #include <iostream>
 
+
 Netizen::Netizen(long id, std::string key) :
     m_id{id}, m_key{key}
 {
-    //生成默认用户名
-    m_nickname = "k_" + std::to_string(id);
+        m_nickname = "kk_" + std::to_string(id);     //生成默认用户名
 }
 
 Netizen::~Netizen()

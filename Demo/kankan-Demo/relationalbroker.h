@@ -13,7 +13,7 @@ public:
 
     //执行数据库查询操作，返回数据集
     //sql:SQL语句
-    sql::ResultSet* query(std::string sql);
+    std::shared_ptr<sql::ResultSet> query(std::string sql);
 
     //执行数据库插入操作
     //sql:SQL语句

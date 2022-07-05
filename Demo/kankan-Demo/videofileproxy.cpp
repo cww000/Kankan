@@ -14,6 +14,6 @@ VideoFileProxy::~VideoFileProxy()
 std::string VideoFileProxy::getVideoFileInfo(std::string id)
 {
     if (m_videoFile == nullptr)
-        m_videoFile = std::make_shared<VideoFile>(VideoFileBroker::getInstance()->getVideoFile());
+        m_videoFile = VideoFileBroker::getInstance()->getVideoFile(id);
     return m_videoFile->getDuration();
 }

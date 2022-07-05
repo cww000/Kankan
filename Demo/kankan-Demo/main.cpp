@@ -8,7 +8,7 @@ int main()
     VideoSocialControl control;
     control.login(20220628, "zhuyoucheng");
 
-    control.login("lwc");
+    //control.login("lwc");
 
     return 0;
 }

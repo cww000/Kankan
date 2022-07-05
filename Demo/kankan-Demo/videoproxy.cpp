@@ -11,7 +11,7 @@ VideoProxy::VideoProxy(std::string id) :
 std::vector<std::string> VideoProxy::getVideoInfo(std::string id)
 {
     if (m_video == nullptr)
-        m_video = std::make_shared<Video>(VideoBroker::getInstance()->getVideo(id));
+        m_video = VideoBroker::getInstance()->getVideo(id);
         //实例化video对象
     m_video->getVideoInfo();//获取video对象的数据概要
 }

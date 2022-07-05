@@ -10,7 +10,7 @@ public:
     virtual ~VideoFileBroker();
     static VideoFileBroker* getInstance();
 
-    VideoFile* getVideoFile();
+    std::shared_ptr<VideoFile> getVideoFile(std::string& id);
 private:
     VideoFileBroker();
 

@@ -7,9 +7,9 @@ Video::Video(std::string id, std::string description, std::string title,
              std::string cover, std::string date, std::string videoFileId) :
     m_id{id}, m_description{description}, m_title{title},
     m_label{label}, m_subarea{subarea}, m_isOriginal{isOriginal},
-    m_cover{cover}, m_date{date}
+    m_cover{cover}, m_date{date}, m_videoFile(std::make_pair(videoFileId, VideoFileProxy(videoFileId)))
 {
-    m_videoFile = std::make_pair(videoFileId, new VideoFileProxy(videoFileId));
+
 }
 
 Video::~Video()
@@ -31,5 +31,5 @@ void Video::init(std::string id)
     m_videoFile.second.getVideoFileInfo(id);
 
     for (auto comment : _comments)
-        comment.second->getCommentInfo(comment.first);
+        comment.second.getCommentInfo(comment.first);
 }

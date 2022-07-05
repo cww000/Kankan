@@ -3,6 +3,7 @@
 #include "netizenbroker.h"
 #include <iostream>
 #include <utility>
+#include <time.h>
 
 VideoSocialControl::VideoSocialControl()
 {
@@ -12,8 +13,11 @@ VideoSocialControl::VideoSocialControl()
 //注册
 void VideoSocialControl::login(std::string key)
 {
-    //id等待系统分配
-    long id = 20220630;
+    time_t result = time(NULL);
+    long id{0};
+    if (result != (time_t)(-1))
+        id = result;    //系统根据时间分配id
+
     //添加新的用户记录
     NetizenBroker::getInstance()->insertNewNetizen(std::make_shared<Netizen>(id, key));
 
@@ -24,17 +28,15 @@ void VideoSocialControl::login(std::string key)
 //登录
 void VideoSocialControl::login(long id, std::string key)
 {
-    //id存在
     if (NetizenBroker::getInstance()->qualifyNetizenId(id)) {
-        std::cout << "用户存在" << std::endl;
-        //密码正确
+        std::cout << "用户id存在" << std::endl;
         if (NetizenBroker::getInstance()->qualifyNetizenKey(id, key)) {
             std::cout << "密码正确" << std::endl;
-        } else {//密码错误
+        } else {
             std::cout << "密码错误" << std::endl;
         }
-    } else {//id不存在
-        std::cout << "用户不存在" << std::endl;
+    } else {
+        std::cout << "用户id不存在" << std::endl;
     }
 
     auto netizen = NetizenBroker::getInstance()->findNetizenById(id);
