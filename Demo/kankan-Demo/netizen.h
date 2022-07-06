@@ -24,7 +24,7 @@ public:
     //videosId:稿件的id
     //fansId:粉丝的id
     //followersId:关注者的id
-    Netizen(long id, std::string nickname, std::vector<std::string> videosId,
+    Netizen(long id, std::string nickname, std::string headPortrait, std::vector<std::string> videosId,
             std::vector<long> fansId, std::vector<long> followersId);
 
 

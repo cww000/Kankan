@@ -4,7 +4,7 @@
 #include "relationalbroker.h"
 #include "comment.h"
 
-class CommentBroker
+class CommentBroker : public RelationalBroker
 {
 public:
     ~CommentBroker();

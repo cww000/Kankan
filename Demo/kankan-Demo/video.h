@@ -15,8 +15,10 @@ class Image;
 class Video : public VideoInterface
 {
 public:
+    Video() = delete;
     Video(std::string id, std::string description, std::string title, std::string label,
-          std::string subarea, bool isOriginal, std::string cover, std::string date, std::string videoFileId);
+          std::string subarea, bool isOriginal, std::string cover, std::string date,
+          std::vector<std::string> commentIds, std::string videoFileId);
     ~Video();
 
     std::vector<std::string> getVideoInfo();

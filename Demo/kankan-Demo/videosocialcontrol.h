@@ -26,6 +26,14 @@ public:
 
     //加载稿件的完整信息
     void loadVidoe(std::string id);
+
+    //合并视频
+    std::string mergeVideoFiles(std::vector<std::string> videoFiles);
+
+    //生成稿件
+    void createVideo(std::string description, std::string title, std::string label,
+                     std::string subarea, bool isOriginal, std::string cover, std::string date,
+                     std::vector<std::string> commentIds, std::string videoFileId);
 };
 
 #endif // VIDEOSOCIALCONTROL_H

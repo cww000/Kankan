@@ -1,6 +1,7 @@
 #include "netizenproxy.h"
 #include "netizenbroker.h"
 #include "netizen.h"
+#include <iostream>
 
 NetizenProxy::NetizenProxy(long id) :
     m_id{id}, m_netizen{}

@@ -10,42 +10,43 @@ create table user(
 ) DEFAULT CHARSET=utf8mb4 COMMENT="用户信息表";
 
 create table video( 
-	user_id BIGINT, 
-	id VARCHAR(60) UNIQUE NOT NULL PRIMARY KEY,  
-	description VARCHAR(60), 
-	title VARCHAR(40) NOT NULL,  
+	id VARCHAR(30) UNIQUE NOT NULL PRIMARY KEY,  
+	description VARCHAR(30), 
+	title VARCHAR(30) NOT NULL,  
 	label VARCHAR(20), 
 	subarea VARCHAR(20), 
 	isOriginal boolean NOT NULL, 
-	cover VARCHAR(40) NOT NULL,
-	date VARCHAR(40) NOT NULL,
+	cover VARCHAR(30) NOT NULL,
+	date VARCHAR(30) NOT NULL,
+	user_id BIGINT,
 	FOREIGN KEY(user_id) REFERENCES user(user_id)
 ) DEFAULT CHARSET=utf8mb4 COMMENT="稿件信息表";
 
 create table videoFile(
-	id VARCHAR(60) UNIQUE NOT NULL PRIMARY KEY,
-	address VARCHAR(60) NOT NULL,
-	FOREIGN KEY(id) REFERENCES video(id)
+	id VARCHAR(30) UNIQUE NOT NULL PRIMARY KEY,
+	address VARCHAR(30) NOT NULL,
+	videoId VARCHAR(30),
+	FOREIGN KEY(videoId) REFERENCES video(id)
 ) DEFAULT CHARSET=utf8mb4 COMMENT="视频文件数据表";
 
 create table fan( 
 	user_id BIGINT, 
-	user_nickname VARCHAR(10),
+	user_nickname VARCHAR(20),
 	fan_id BIGINT,
-	fan_nickname VARCHAR(10)
+	fan_nickname VARCHAR(20)
 ) DEFAULT CHARSET=utf8mb4 COMMENT="粉丝表";
 
 create table follower( 
 	user_id BIGINT,
-        user_nickname VARCHAR(10),	
+        user_nickname VARCHAR(20),	
 	follower_id BIGINT,
-	follower_nickname VARCHAR(10)
+	follower_nickname VARCHAR(20)
 ) DEFAULT CHARSET=utf8mb4 COMMENT="关注者表";
 
 create table comment(
 	id VARCHAR(30) UNIQUE NOT NULL PRIMARY KEY,
-	text VARCHAR(100) NOT NULL,
-	videoId VARCHAR(60) NOT NULL,
+	text VARCHAR(30) NOT NULL,
+	videoId VARCHAR(30) NOT NULL,
 	user_id BIGINT 
 ) DEFAULT CHARSET=utf8mb4 COMMENT="评论表";
 

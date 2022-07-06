@@ -7,7 +7,7 @@
 class Comment : public CommentInterface
 {
 public:
-    Comment();
+    Comment(std::string id, std::string text);
     ~Comment();
 
     std::string getText(){ return m_text; };

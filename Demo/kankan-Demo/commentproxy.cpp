@@ -1,7 +1,7 @@
 #include "commentproxy.h"
 #include "commentbroker.h"
 
-CommentProxy::CommentProxy()
+CommentProxy::CommentProxy(std::string &id) : m_id{id}
 {
 
 }

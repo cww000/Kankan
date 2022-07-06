@@ -40,6 +40,7 @@ void VideoSocialControl::login(long id, std::string key)
     }
 
     auto netizen = NetizenBroker::getInstance()->findNetizenById(id);
+
     netizen->init();//初始化稿件（含视频）、粉丝列表、关注列表初始化
 }
 
@@ -63,6 +64,24 @@ void VideoSocialControl::getSomeVideos(std::vector<std::string> ids)
 
 void VideoSocialControl::loadVidoe(std::string id)
 {
+
+}
+
+std::string VideoSocialControl::mergeVideoFiles(std::vector<std::string> videoFiles)
+{
+    //合并视频，保存一个本地的合并后的视频文件地址
+
+    //生成一个新的VideoFile的id
+
+    //返回视频id
+
+}
+
+void VideoSocialControl::createVideo(std::string description, std::string title, std::string label, std::string subarea, bool isOriginal, std::string cover, std::string date, std::vector<std::string> commentIds, std::string videoFileId)
+{
+    //生成Video的id
+
+    //构造Video对象
 
 }
 

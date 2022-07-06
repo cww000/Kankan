@@ -1,6 +1,7 @@
 #include "comment.h"
 
-Comment::Comment()
+Comment::Comment(std::string id, std::string text) :
+    m_id{id}, m_text{text}
 {
 
 }

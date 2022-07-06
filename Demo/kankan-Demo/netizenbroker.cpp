@@ -68,8 +68,10 @@ std::shared_ptr<Netizen> NetizenBroker::findNetizenById(long id)
     std::cout << "用户名：" << nickname << std::endl;
 
     //调用Netizen(id, nickname, videosId, fansId, followersId);
-    std::shared_ptr<Netizen> netizen = std::make_shared<Netizen>(id, nickname, findNetizenVideos(id),
+    std::shared_ptr<Netizen> netizen = std::make_shared<Netizen>(id, "www.cv",nickname, findNetizenVideos(id),
                                                         findNetizenFans(id), findNetizenFollowers(id));
+
+    std::cout << "Netizen对象实例化成功" << std::endl;
 
     return netizen;
 }

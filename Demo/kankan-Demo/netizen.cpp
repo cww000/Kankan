@@ -19,9 +19,9 @@ std::string Netizen::insertSql()
     return "insert into user values( " + std::to_string(m_id) + ", '" + m_key + "', '" + m_nickname + "');";
 }
 
-Netizen::Netizen(long id, std::string nickname, std::vector<std::string> videosId,
+Netizen::Netizen(long id, std::string nickname, std::string headPortrait, std::vector<std::string> videosId,
                  std::vector<long> fansId, std::vector<long> followersId) :
-    m_id{id}, m_nickname{nickname}
+    m_id{id}, m_headPortrait{headPortrait}, m_key{" "}, m_nickname{nickname}
 {
     for (auto vId : videosId) {
         _videos.insert(std::make_pair(vId, VideoProxy(vId)));
@@ -45,9 +45,9 @@ Netizen::Netizen(long id, std::string nickname, std::vector<std::string> videosI
 void Netizen::init()
 {
     //getVideoInfo如何存储返回的数据
-    for (auto video : _videos)
+    for (auto video : _videos){
         video.second.getVideoInfo(video.first);
-
+    }
     for (auto fan : _fans)
         fan.second.getInfo(fan.first);
 
@@ -60,6 +60,12 @@ std::vector<std::string> Netizen::getInfo()
     std::vector<std::string> results;
     results.push_back(m_headPortrait);
     results.push_back(m_nickname);
+
+    //测试
+    std::cout << "NetizenInfo: " ;
+    for (auto g : results)
+        std::cout << g << "   ";
+    std::cout << "\n";
 
     return results;
 }
