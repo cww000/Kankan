@@ -18,6 +18,8 @@ public:
     //创造insert的sql语句
     std::string insertSql();
 
+
+
     //获取用户id,昵称，所有的稿件id，粉丝的id，关注者的id
     //id:用户id
     //nickname:用户昵称
@@ -35,6 +37,9 @@ public:
     //返回网民的昵称和头像
     std::vector<std::string> getInfo();
 
+
+    const std::string &key() const;
+    const std::string &nickname() const;
 
 private:
     long m_id;                                                      //用户id

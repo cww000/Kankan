@@ -3,6 +3,7 @@
 #include <mariadb/conncpp.hpp>
 #include <stdexcept>
 
+std::unique_ptr<sql::Connection> RelationalBroker::conn = {};
 
 RelationalBroker::RelationalBroker()
 {
@@ -45,5 +46,25 @@ void RelationalBroker::insert(std::string sql)
         stmnt->executeQuery();
     } catch (sql::SQLException& e) {
         std::cerr << "Error insert：" << e.what() << std::endl;
+    }
+}
+
+void RelationalBroker::del(std::string sql)
+{
+    try {
+        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement(sql));
+        stmnt->executeQuery();
+    } catch (sql::SQLException& e) {
+        std::cerr << "Error delete：" << e.what() << std::endl;
+    }
+}
+
+void RelationalBroker::update(std::string sql)
+{
+    try {
+        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement(sql));
+        stmnt->executeQuery();
+    } catch (sql::SQLException& e) {
+        std::cerr << "Error update：" << e.what() << std::endl;
     }
 }

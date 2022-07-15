@@ -5,7 +5,6 @@
 #include "videointerface.h"
 #include <vector>
 #include <string>
-
 class Video;
 
 class VideoProxy : public VideoInterface
