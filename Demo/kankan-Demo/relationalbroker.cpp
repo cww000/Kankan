@@ -3,7 +3,6 @@
 #include <mariadb/conncpp.hpp>
 #include <stdexcept>
 
-std::unique_ptr<sql::Connection> RelationalBroker::conn = {};
 
 RelationalBroker::RelationalBroker()
 {
@@ -13,7 +12,7 @@ RelationalBroker::RelationalBroker()
 
         //Configure Connection
         sql::SQLString url("jdbc:mariadb://127.0.0.1:3306/Kankan");
-        sql::Properties properties({{"user", "root"}, {"password", "200909"}});
+        sql::Properties properties({{"user", "zc"}, {"password", "20010202"}});
 
         //建立连接
         conn= std::unique_ptr<sql::Connection>(driver->connect(url, properties));
@@ -46,25 +45,5 @@ void RelationalBroker::insert(std::string sql)
         stmnt->executeQuery();
     } catch (sql::SQLException& e) {
         std::cerr << "Error insert：" << e.what() << std::endl;
-    }
-}
-
-void RelationalBroker::del(std::string sql)
-{
-    try {
-        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement(sql));
-        stmnt->executeQuery();
-    } catch (sql::SQLException& e) {
-        std::cerr << "Error delete：" << e.what() << std::endl;
-    }
-}
-
-void RelationalBroker::update(std::string sql)
-{
-    try {
-        std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement(sql));
-        stmnt->executeQuery();
-    } catch (sql::SQLException& e) {
-        std::cerr << "Error update：" << e.what() << std::endl;
     }
 }

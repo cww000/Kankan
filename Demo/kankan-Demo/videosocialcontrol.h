@@ -4,7 +4,6 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "mytimer.h"
 
 class Netizen;
 
@@ -12,7 +11,7 @@ class VideoSocialControl
 {
 public:
     VideoSocialControl();
-    ~VideoSocialControl();
+
     //注册
     //key:用户设置的密码
     void login(std::string key);
@@ -33,11 +32,8 @@ public:
 
     //生成稿件
     void createVideo(std::string description, std::string title, std::string label,
-                     std::string subarea, bool isOriginal, std::string cover, std::string date, std::vector<std::string> commentIds, std::string videoFileId);
-
-private:
-    static void flush();
-    MyTimer m_timer;
+                     std::string subarea, bool isOriginal, std::string cover, std::string date,
+                     std::vector<std::string> commentIds, std::string videoFileId);
 };
 
 #endif // VIDEOSOCIALCONTROL_H

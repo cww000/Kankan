@@ -4,7 +4,6 @@
 #include <memory>
 #include "videofileinterface.h"
 #include <vector>
-#include <string>
 
 class VideoFile;
 

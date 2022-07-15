@@ -45,19 +45,14 @@ Netizen::Netizen(long id, std::string nickname, std::string headPortrait, std::v
 void Netizen::init()
 {
     //getVideoInfo如何存储返回的数据
-    std::cout << "稿件信息：\n";
     for (auto video : _videos){
         video.second.getVideoInfo(video.first);
     }
-    std::cout << "粉丝信息：\n";
-    for (auto fan : _fans) {
+    for (auto fan : _fans)
         fan.second.getInfo(fan.first);
-    }
 
-    std::cout << "关注者信息：\n";
-    for (auto follower : _followers) {
+    for (auto follower : _followers)
         follower.second.getInfo(follower.first);
-    }
 }
 
 std::vector<std::string> Netizen::getInfo()
@@ -73,14 +68,4 @@ std::vector<std::string> Netizen::getInfo()
     std::cout << "\n";
 
     return results;
-}
-
-const std::string &Netizen::key() const
-{
-    return m_key;
-}
-
-const std::string &Netizen::nickname() const
-{
-    return m_nickname;
 }

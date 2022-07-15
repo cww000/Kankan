@@ -4,17 +4,8 @@
 #include <iostream>
 #include <utility>
 #include <time.h>
-#include "commentbroker.h"
-#include "videobroker.h"
-#include "videofilebroker.h"
-
 
 VideoSocialControl::VideoSocialControl()
-{
-    m_timer.start(2000, flush);
-}
-
-VideoSocialControl::~VideoSocialControl()
 {
 
 }
@@ -92,15 +83,6 @@ void VideoSocialControl::createVideo(std::string description, std::string title,
 
     //构造Video对象
 
-}
-
-void VideoSocialControl::flush()
-{
-    NetizenBroker::getInstance()->flush();
-    VideoBroker::getInstance()->flush();
-    VideoFileBroker::getInstance()->flush();
-    CommentBroker::getInstance()->flush();
-    std::cout << "执行了一次刷新" << std::endl;
 }
 
 
