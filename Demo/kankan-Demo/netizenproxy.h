@@ -14,6 +14,8 @@ public:
     ~NetizenProxy();
 
     std::vector<std::string> getInfo(long id);
+    bool isOnline();
+    void updateMessage(std::string messageId);
 private:
     long m_id;
     std::shared_ptr<Netizen> m_netizen;

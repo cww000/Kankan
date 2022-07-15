@@ -13,8 +13,8 @@ std::vector<std::string> VideoProxy::getVideoInfo(const std::string& id)
 {
 
     if (m_video == nullptr)
-        m_video = VideoBroker::getInstance()->getVideo(id);
-        //实例化video对象
+        m_video = VideoBroker::getInstance()->getVideo(id); //实例化video对象
+
     return m_video->getVideoInfo();//获取video对象的数据概要
 }
 

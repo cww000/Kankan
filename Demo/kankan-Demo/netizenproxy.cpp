@@ -20,3 +20,17 @@ std::vector<std::string> NetizenProxy::getInfo(long id)
         m_netizen = NetizenBroker::getInstance()->findNetizenById(id);
     return m_netizen->getInfo();
 }
+
+bool NetizenProxy::isOnline()
+{
+    if (m_netizen == nullptr)
+        m_netizen = NetizenBroker::getInstance()->findNetizenById(m_id);
+    return m_netizen->online();
+}
+
+void NetizenProxy::updateMessage(std::string messageId)
+{
+    if (m_netizen == nullptr)
+        m_netizen = NetizenBroker::getInstance()->findNetizenById(m_id);
+    return m_netizen->updateMessage(messageId);
+}

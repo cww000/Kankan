@@ -4,6 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 LIBS += -lmariadbcpp
+unix|win32: LIBS += -lpthread
+
 
 SOURCES += \
         cache.cpp \
@@ -11,9 +13,12 @@ SOURCES += \
         commentbroker.cpp \
         commentproxy.cpp \
         main.cpp \
+        messagesequence.cpp \
+        mytimer.cpp \
         netizen.cpp \
         netizenbroker.cpp \
         netizenproxy.cpp \
+        publishvideonotification.cpp \
         relationalbroker.cpp \
         video.cpp \
         videobroker.cpp \
@@ -29,10 +34,13 @@ HEADERS += \
     commentbroker.h \
     commentinterface.h \
     commentproxy.h \
+    messagesequence.h \
+    mytimer.h \
     netizen.h \
     netizenbroker.h \
     netizeninterface.h \
     netizenproxy.h \
+    publishvideonotification.h \
     relationalbroker.h \
     video.h \
     videobroker.h \

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "commentinterface.h"
+#include <string>
 
 class Comment;
 
