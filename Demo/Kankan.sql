@@ -26,7 +26,7 @@ create table videoFile(
 	id VARCHAR(30) UNIQUE NOT NULL PRIMARY KEY,
 	address VARCHAR(30) NOT NULL,
 	videoId VARCHAR(30),
-	FOREIGN KEY(videoId) REFERENCES video(id)
+	FOREIGN KEY(videoId) REFERENCES video(id) on delete cascade
 ) DEFAULT CHARSET=utf8mb4 COMMENT="视频文件数据表";
 
 create table fan( 
@@ -38,7 +38,7 @@ create table fan(
 
 create table follower( 
 	user_id BIGINT,
-        user_nickname VARCHAR(20),	
+	user_nickname VARCHAR(20),	
 	follower_id BIGINT,
 	follower_nickname VARCHAR(20)
 ) DEFAULT CHARSET=utf8mb4 COMMENT="关注者表";

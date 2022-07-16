@@ -42,18 +42,26 @@ public:
     //关注
     void follow(long followerId);
 
+    //添加粉丝
+    void addFan(long fanId, const Netizen* fan);
+
+    //删除稿件
+    void deleteVideo(const std::string& videoId);
+
     //添加新的稿件给网民
     void addNewVideo(std::string& id);
 
-    const std::string &key() const;
-    const std::string &nickname() const;
+    const std::string key() const;
+    const std::string nickname() const;
 
     bool online() {return m_online;}
-    void setOnline(bool online) {m_online = online;}
+    void setOnline(bool online) {m_online = online;}  //设置网民在线或离线
+
     //添加一条未查看消息
     void updateMessage(const std::string& messageId);
     //选择查看某条消息
     void checkOneMessage(const std::string& messageId);
+
 
 private:
 

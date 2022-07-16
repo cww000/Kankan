@@ -1,11 +1,14 @@
 #include <string>
 #include <iostream>
+#include <vector>
 #include "netizen.h"
 #include "comment.h"
 #include "commentbroker.h"
 #include "videobroker.h"
 #include "publishvideonotification.h"
 #include "messagesequence.h"
+#include "netizenbroker.h"
+#include "videofilebroker.h"
 
 Netizen::Netizen(long id, std::string key) :
     m_id{id}, m_key{key}
@@ -44,6 +47,7 @@ Netizen::Netizen(long id, std::string nickname, std::string headPortrait, std::v
         std::cout << "关注者id：";
         std::cout << followerId << std::endl;
     }
+
 }
 
 void Netizen::init()
@@ -102,19 +106,20 @@ void Netizen::comment(const std::string &content, const std::string &videoId)
 void Netizen::publishVideo(std::string description, std::string title, std::string label, std::string subarea, bool isOriginal, std::string cover, std::string date, std::string videoFileId)
 {
     //1. 生成Video的id
-    std::string id ="1";
+    std::string id ="0628_video";
     //新创建的稿件没有评论
     std::vector<std::string> comments;
     //2. 构造Video对象
     Video video(id, description, title, label, subarea, isOriginal, cover,
                 date, m_id, comments, videoFileId);
 
-    //3. 将video存入缓存
+    //3. 将video存入净缓存
     VideoBroker::getInstance()->addVideo(id, video);
 
-    //4. 将videoFile对象存入缓存
+    //4. 将videoFile对象存入净缓存
     //在这之前，还是需要一个VideoFile对象
-   // VideoFileBroker::getInstance()->addVideoFile(videoFileId, videoFile)
+    VideoFile videoFile(videoFileId, "www.Youchengzhu.com", id);
+    VideoFileBroker::getInstance()->addVideoFile(videoFileId, videoFile);
 
     //5. 建立稿件与网民的连接
     addNewVideo(id);
@@ -130,6 +135,51 @@ void Netizen::publishVideo(std::string description, std::string title, std::stri
 
 void Netizen::follow(long followerId)
 {
+    //实例化被关注者
+    auto follower = NetizenBroker::getInstance()->findNetizenById(followerId);
+
+    //在网民和他想要关注的人之间建立联系（网民与关注者）
+    _followers.insert({followerId, NetizenProxy(followerId)});
+    std::string sql = "insert into follower values(" + std::to_string(m_id) + ",'" + m_nickname + "'," + std::to_string(followerId) + ",'" + follower->nickname() + "')";
+    std::cout << sql << std::endl;
+    NetizenBroker::getInstance()->insert(sql);
+
+    std::cout << "关注成功\n";
+
+    //在被关注的人和该网民之间建立联系（网民与粉丝)
+    follower->addFan(m_id, this);
+
+}
+
+void Netizen::addFan(long fanId, const Netizen* fan)
+{
+    _fans.insert({fanId, NetizenProxy(fanId)});
+    std::string sql = "insert into fan values(" + std::to_string(m_id) + ",'" + m_nickname + "'," + std::to_string(fanId) + ",'" + fan->nickname() + "')";
+    std::cout << sql << std::endl;
+    NetizenBroker::getInstance()->insert(sql);
+}
+
+void Netizen::deleteVideo(const std::string &videoId)
+{
+    //1.删除网民与这个已发布的稿件的联系
+    _videos.erase(videoId);
+
+    //2.实例化想要删除的稿件
+    auto video = VideoBroker::getInstance()->getVideo(videoId);
+
+    //3.获取稿件中的视频文件和评论
+    auto videoFile =VideoFileBroker::getInstance()->getVideoFile(video->videoFile().first);
+    auto comments = video->comments();
+
+    //4.将要删除的评论加入到新的或者旧的删除缓存
+    for (const auto& com : comments) {
+        auto temp = CommentBroker::getInstance()->getComment(com.first);
+        CommentBroker::getInstance()->deleteComment(com.first, *temp);
+    }
+
+    //5.将稿件和视频文件加入对应新的或者旧的删除缓存
+    VideoFileBroker::getInstance()->deleteVideoFile(video->videoFile().first , *videoFile);
+    VideoBroker::getInstance()->deleteVideo(videoId, *video);
 
 }
 
@@ -138,12 +188,12 @@ void Netizen::addNewVideo(std::string &id)
     _videos.insert({id, VideoProxy(id)});
 }
 
-const std::string &Netizen::key() const
+const std::string Netizen::key() const
 {
     return m_key;
 }
 
-const std::string &Netizen::nickname() const
+const std::string Netizen::nickname() const
 {
     return m_nickname;
 }
@@ -172,6 +222,7 @@ void Netizen::checkOneMessage(const std::string &messageId)
 void Netizen::checkOneVideo(const std::string& videoId)
 {
     auto video = VideoBroker::getInstance()->getVideo(videoId);
+    std::cout << "get a video message\n";
     video->getVideoInfo();
 }
 

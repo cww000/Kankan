@@ -75,7 +75,7 @@ std::shared_ptr<Netizen> NetizenBroker::inCache(long id)
 void NetizenBroker::cacheFlush()
 {
     if (!_newClean.empty() || !_newClean.empty()) {
-        std::string sql = "insert into user values ";
+        std::string sql = "insert into user values";
         for(auto iter = _newClean.begin(); iter != _newClean.end();){
 
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
@@ -97,7 +97,7 @@ void NetizenBroker::cacheFlush()
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。
-            _newClean.erase(it++);
+            _newDirty.erase(it++);
         }
 
         if (!sql.empty()) sql.pop_back();

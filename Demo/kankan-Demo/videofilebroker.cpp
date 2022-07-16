@@ -56,6 +56,32 @@ void VideoFileBroker::addVideoFile(const std::string &id, const VideoFile &video
     _newClean.insert({id, videoFile});
 }
 
+void VideoFileBroker::deleteVideoFile(const std::string &id, const VideoFile &videoFile)
+{
+    int n = judgeFrom(id);
+    if (n == 0) {
+        //如果该评论对象是在新的净缓存中
+        //将该评论对象从新的净缓存移动到新的删除缓存
+        _newClean.erase(id);
+        _newDelete.insert({id, videoFile});
+    } else if (n == 1){
+        //如果该评论对象是在新的脏缓存中
+        //将该评论对象从新的脏缓存移动到新的删除缓存
+        _newDirty.erase(id);
+        _newDelete.insert({id, videoFile});
+    } else if (n == 2) {
+          //如果该评论对象是在旧的净缓存中
+          //将该评论对象从旧的净缓存移动到旧的删除缓存
+        _oldClean.erase(id);
+        _oldDelete.insert({id, videoFile});
+    } else {
+        //如果该评论对象是在旧的脏缓存中
+        //将该评论对象从旧的脏缓存移动到旧的删除缓存
+        _oldDirty.erase(id);
+        _oldDelete.insert({id, videoFile});
+    }
+}
+
 
 std::shared_ptr<VideoFile> VideoFileBroker::inCache(std::string id)
 {
@@ -88,6 +114,17 @@ std::shared_ptr<VideoFile> VideoFileBroker::inCache(std::string id)
     return nullptr;
 }
 
+int VideoFileBroker::judgeFrom(const std::string &id)
+{
+    if (_newClean.count(id)) return 0;
+    if (_newDirty.count(id)) return 1;
+    if (_oldClean.count(id)) return 2;
+    if (_oldDirty.count(id)) return 3;
+
+    //此时要删除的数据在数据库中，则从数据库读取数据，并将其放到旧的净缓存中
+    return 2;
+}
+
 VideoFileBroker::VideoFileBroker()
 {
 
@@ -96,7 +133,7 @@ VideoFileBroker::VideoFileBroker()
 void VideoFileBroker::cacheFlush()
 {
     if (!_newClean.empty() || !_newClean.empty()) {
-        std::string sql = "insert into comment values ";
+        std::string sql = "insert into videoFile values";
         for(auto iter = _newClean.begin(); iter != _newClean.end();){
 
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
@@ -118,7 +155,7 @@ void VideoFileBroker::cacheFlush()
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。
-            _newClean.erase(it++);
+            _newDirty.erase(it++);
         }
 
         if (!sql.empty()) sql.pop_back(); //去掉最后一个逗号
@@ -149,8 +186,11 @@ void VideoFileBroker::cacheDel()
         //应该保证当进行插入时，数据是不可以被其他线程所更改的
         std::lock_guard<std::mutex> lk(m_mutex);
 
-        std::string sql = "delete from videofile where id=" + it->first;
+        std::string sql = "delete from videoFile where id='" + it->first + "'";
+        std::cout << sql << std::endl;
+        //数据库中的videoFile数据就爱能够会用到级联删除
         del(sql);
+
         //从对应缓存中删除相关数据
         //erase的返回值是一个迭代器，指向删除元素下一个元素。
         _oldDelete.erase(it++);    //删除旧的 删除缓存

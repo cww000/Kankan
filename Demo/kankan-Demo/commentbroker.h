@@ -13,7 +13,12 @@ public:
     static void flush();
     std::shared_ptr<Comment> getComment(const std::string& id);
     std::shared_ptr<Comment> retrieveComment(const std::string& id);
+    //将新增的评论添加到新的净缓存
     void addComment(const std::string& id, const Comment& comment);
+
+    //删除评论
+    void deleteComment(const std::string& id, const Comment& comment);
+
 private:
     CommentBroker();
     static CommentBroker* m_commentBroker;
@@ -29,6 +34,7 @@ private:
     static void cacheDel();  //删除数据库中的数据
     static void cacheUpdate();   //修改数据库中的数据
     static std::shared_ptr<Comment> inCache(std::string id);   //判断是否在缓存中
+    int judgeFrom(const std::string& id);  //判断要删除的数据是在哪一个缓存
 };
 
 #endif // COMMENTBROKER_H

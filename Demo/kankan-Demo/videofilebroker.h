@@ -13,6 +13,8 @@ public:
     std::shared_ptr<VideoFile> getVideoFile(const std::string& id);
     std::shared_ptr<VideoFile> retrieveVideoFile(const std::string& id);
     void addVideoFile(const std::string& id, const VideoFile& videoFile);
+    //删除视频文件
+    void deleteVideoFile(const std::string& id, const VideoFile& videoFile);
 private:
     VideoFileBroker();
     static VideoFileBroker* m_videoFileBroker;
@@ -28,6 +30,7 @@ private:
     static void cacheDel();      //删除数据库中的数据
     static void cacheUpdate();   //修改数据库中的数据
     static std::shared_ptr<VideoFile> inCache(std::string id);   //判断是否在缓存中
+    int judgeFrom(const std::string& id);  //判断要删除的数据是在哪一个缓存
 };
 
 #endif // VIDEOFILEBROKER_H

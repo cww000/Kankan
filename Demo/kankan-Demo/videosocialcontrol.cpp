@@ -50,6 +50,7 @@ void VideoSocialControl::login(long id, std::string key)
             std::cout << "密码正确" << std::endl;
 
             auto netizen = NetizenBroker::getInstance()->findNetizenById(id);
+            netizen->setOnline(true);  //设置网民在线
             netizen->init();//初始化稿件（含视频）、粉丝列表、关注列表初始化
 
         } else {
@@ -102,6 +103,12 @@ void VideoSocialControl::createVideo(std::string description, std::string title,
                            cover, date, videoFileId);
 }
 
+void VideoSocialControl::deleteVideo(long netizenId, const std::string &videoId)
+{
+    auto netizen = NetizenBroker::getInstance()->findNetizenById(netizenId);
+    netizen->deleteVideo(videoId);
+}
+
 void VideoSocialControl::commentVideo(std::string &content, long netizenId, const std::string videoId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
@@ -112,6 +119,12 @@ void VideoSocialControl::follow(long netizenId, long followerId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->follow(followerId);
+}
+
+void VideoSocialControl::checkOneMessage(long netizenId, std::string messageId)
+{
+    auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
+    netizen->checkOneMessage(messageId);
 }
 
 void VideoSocialControl::flush()

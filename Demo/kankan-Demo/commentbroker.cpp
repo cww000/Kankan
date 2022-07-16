@@ -67,10 +67,36 @@ void CommentBroker::addComment(const std::string& id,const Comment &comment)
     _newClean.insert({id,comment});
 }
 
+void CommentBroker::deleteComment(const std::string &id, const Comment &comment)
+{
+    int n = judgeFrom(id);
+    if (n == 0) {
+        //如果该评论对象是在新的净缓存中
+        //将该评论对象从新的净缓存移动到新的删除缓存
+         _newClean.erase(id);
+        _newDelete.insert({id, comment});
+    } else if (n == 1){
+        //如果该评论对象是在新的脏缓存中
+        //将该评论对象从新的脏缓存移动到新的删除缓存
+         _newDirty.erase(id);
+        _newDelete.insert({id, comment});
+    } else if (n == 2) {
+          //如果该评论对象是在旧的净缓存中
+          //将该评论对象从旧的净缓存移动到旧的删除缓存
+         _oldClean.erase(id);
+        _oldDelete.insert({id, comment});
+    } else {
+        //如果该评论对象是在旧的脏缓存中
+        //将该评论对象从旧的脏缓存移动到旧的删除缓存
+        _oldDirty.erase(id);
+        _oldDelete.insert({id, comment});
+    }
+}
+
 void CommentBroker::cacheFlush()
 {
-    if (!_newClean.empty() || !_newClean.empty()) {
-        std::string sql = "insert into comment values ";
+    if (!_newClean.empty() || !_newDirty.empty()) {
+        std::string sql = "insert into comment values";
         for(auto iter = _newClean.begin(); iter != _newClean.end();){
 
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
@@ -92,7 +118,7 @@ void CommentBroker::cacheFlush()
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。
-            _newClean.erase(it++);
+            _newDirty.erase(it++);
         }
 
         if (!sql.empty()) sql.pop_back();
@@ -168,4 +194,15 @@ std::shared_ptr<Comment> CommentBroker::inCache(std::string id)
     }
 
     return nullptr;
+}
+
+int CommentBroker::judgeFrom(const std::string &id)
+{
+    if (_newClean.count(id)) return 0;
+    if (_newDirty.count(id)) return 1;
+    if (_oldClean.count(id)) return 2;
+    if (_oldDirty.count(id)) return 3;
+
+    //此时要删除的数据在数据库中，则从数据库读取数据，并将其放到旧的净缓存中
+    return 2;
 }

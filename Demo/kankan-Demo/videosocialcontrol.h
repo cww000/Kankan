@@ -34,11 +34,17 @@ public:
     //生成稿件
     void createVideo(std::string description, std::string title, std::string label, std::string subarea, bool isOriginal, std::string cover, std::string date, long user_id, std::string videoFileId);
 
+    //删除稿件
+    void deleteVideo(long netizenId, const std::string& videoId);
+
     //发表评论
     void commentVideo(std::string& content,long netizenId, const std::string videoId);
 
     //关注
     void follow(long netizenId, long followerId);
+
+    //查看某条未读消息
+    void checkOneMessage(long netizenId, std::string messageId);
 
 private:
     static void flush();

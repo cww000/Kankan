@@ -65,7 +65,6 @@ std::shared_ptr<Video> VideoBroker::retrieveVideo(const std::string &id)
     while (res->next())
         commentIds.push_back(res->getString(1).c_str());
 
-
     sql = "select id from videoFile where videoId = '" + id + "'";
 
     res = query(sql);
@@ -76,6 +75,8 @@ std::shared_ptr<Video> VideoBroker::retrieveVideo(const std::string &id)
     Video v(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], isOriginal, parameters[5], parameters[6], user_id, commentIds, result);
 
     std::cout << "Video对象实例化成功" << std::endl;
+
+    //将从数据库中读出来的数据添加到旧的净缓存
     _oldClean.insert({id, v});
     return std::make_shared<Video>(_oldClean.at(id));
 }
@@ -83,6 +84,32 @@ std::shared_ptr<Video> VideoBroker::retrieveVideo(const std::string &id)
 void VideoBroker::addVideo(const std::string &id, const Video &video)
 {
     _newClean.insert({id, video});
+}
+
+void VideoBroker::deleteVideo(const std::string &id, const Video &video)
+{
+    int n = judgeFrom(id);
+    if (n == 0) {
+        //如果该评论对象是在新的净缓存中
+        //将该评论对象从新的净缓存移动到新的删除缓存
+        _newClean.erase(id);
+        _newDelete.insert({id, video});
+    } else if (n == 1){
+        //如果该评论对象是在新的脏缓存中
+        //将该评论对象从新的脏缓存移动到新的删除缓存
+        _newDirty.erase(id);
+        _newDelete.insert({id, video});
+    } else if (n == 2) {
+          //如果该评论对象是在旧的净缓存中
+          //将该评论对象从旧的净缓存移动到旧的删除缓存
+        _oldClean.erase(id);
+        _oldDelete.insert({id, video});
+    } else {
+        //如果该评论对象是在旧的脏缓存中
+        //将该评论对象从旧的脏缓存移动到旧的删除缓存
+        _oldDirty.erase(id);
+        _oldDelete.insert({id, video});
+    }
 }
 
 std::shared_ptr<Video> VideoBroker::inCache(std::string id)
@@ -116,6 +143,17 @@ std::shared_ptr<Video> VideoBroker::inCache(std::string id)
     return nullptr;
 }
 
+int VideoBroker::judgeFrom(const std::string &id)
+{
+    if (_newClean.count(id)) return 0;
+    if (_newDirty.count(id)) return 1;
+    if (_oldClean.count(id)) return 2;
+    if (_oldDirty.count(id)) return 3;
+
+    //此时要删除的数据在数据库中，则从数据库读取数据，并将其放到旧的净缓存中
+    return 2;
+}
+
 VideoBroker::VideoBroker()
 {
 
@@ -130,8 +168,8 @@ void VideoBroker::flush()
 
 void VideoBroker::cacheFlush()
 {
-    if (!_newClean.empty() || !_newClean.empty()) {
-        std::string sql = "insert into user values ";
+    if (!_newClean.empty() || !_newDirty.empty()) {
+        std::string sql = "insert into video values";
         for(auto iter = _newClean.begin(); iter != _newClean.end();){
 
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
@@ -153,7 +191,7 @@ void VideoBroker::cacheFlush()
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。
-            _newClean.erase(it++);
+            _newDirty.erase(it++);
         }
 
         if (!sql.empty()) sql.pop_back();
@@ -180,6 +218,7 @@ void VideoBroker::cacheDel()
         std::lock_guard<std::mutex> lk(m_mutex);
 
         std::string sql = "delete from video where id='" + it->first + "'";
+        std::cout << sql << std::endl;
         del(sql);
         //从对应缓存中删除相关数据
         //erase的返回值是一个迭代器，指向删除元素下一个元素。

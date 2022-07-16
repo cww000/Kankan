@@ -11,7 +11,7 @@ MessageSequence::MessageSequence()
 
 MessageSequence::~MessageSequence()
 {
-    delete m_messageSeq;
+
 }
 
 MessageSequence* MessageSequence::getInstance()
@@ -56,7 +56,7 @@ void MessageSequence::updateMessageQueue()
 
 void MessageSequence::removeMessageObserver(std::string messageId, long observerId)
 {
-    //删除消息队列中指定message的某个观察者（即以查阅了该message的netizen）
+    //删除消息队列中指定message的某个观察者（即已查阅了该message的netizen）
     m_messageQueue.at(messageId).removeObserver(observerId);
 
     //判断该消息是否全部订阅者查阅完毕
