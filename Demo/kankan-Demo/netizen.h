@@ -18,8 +18,6 @@ public:
     //创造insert的sql语句
     std::string insertSql();
 
-
-
     //获取用户id,昵称，所有的稿件id，粉丝的id，关注者的id
     //id:用户id
     //nickname:用户昵称
@@ -61,6 +59,9 @@ public:
     void updateMessage(const std::string& messageId);
     //选择查看某条消息
     void checkOneMessage(const std::string& messageId);
+
+    //修改个人信息
+    void updateAcountInfo(std::string key, std::string headPortrait, std::string nickname);
 
 
 private:

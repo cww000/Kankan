@@ -1,4 +1,4 @@
-#ifndef NETIZENBROKER_H
+﻿#ifndef NETIZENBROKER_H
 #define NETIZENBROKER_H
 
 #include <memory>
@@ -40,7 +40,12 @@ public:
 
     //通过用户id查找所有关注者id
     std::vector<long> findNetizenFollowers(const long id);
+
+    //添加新的网民到新的净缓存
     void addNetizen(long id, const Netizen& netizen);
+
+    //修改网民账号信息
+    void updateAcountInfo(long id, const Netizen& netizen);
 
 private:
     NetizenBroker();
@@ -57,7 +62,7 @@ private:
     static void cacheDel();  //删除数据库中的数据
     static void cacheUpdate();   //修改数据库中的数据
     static std::shared_ptr<Netizen> inCache(long id);   //判断是否在缓存中
-
+    int judgeFromForUpdate(long id);  //判断要修改的数据是在哪个缓存
 };
 
 #endif // NETIZENBROKER_H

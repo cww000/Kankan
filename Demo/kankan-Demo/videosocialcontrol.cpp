@@ -109,7 +109,7 @@ void VideoSocialControl::deleteVideo(long netizenId, const std::string &videoId)
     netizen->deleteVideo(videoId);
 }
 
-void VideoSocialControl::commentVideo(std::string &content, long netizenId, const std::string videoId)
+void VideoSocialControl::commentVideo(const std::string &content, long netizenId, const std::string videoId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->comment(content, videoId);
@@ -125,6 +125,12 @@ void VideoSocialControl::checkOneMessage(long netizenId, std::string messageId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->checkOneMessage(messageId);
+}
+
+void VideoSocialControl::updateAcountInfo(long netizenId, std::string key, std::string headPortrait, std::string nickname)
+{
+    auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
+    netizen->updateAcountInfo(key, headPortrait, nickname);
 }
 
 void VideoSocialControl::flush()

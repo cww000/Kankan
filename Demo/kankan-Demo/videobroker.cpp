@@ -88,7 +88,7 @@ void VideoBroker::addVideo(const std::string &id, const Video &video)
 
 void VideoBroker::deleteVideo(const std::string &id, const Video &video)
 {
-    int n = judgeFrom(id);
+    int n = judgeFromForDel(id);
     if (n == 0) {
         //如果该评论对象是在新的净缓存中
         //将该评论对象从新的净缓存移动到新的删除缓存
@@ -124,9 +124,9 @@ std::shared_ptr<Video> VideoBroker::inCache(std::string id)
         return std::make_shared<Video>(_newDirty.at(id));
     }
 
-    if (_newDelete.count(id)) {
-        return std::make_shared<Video>(_newDelete.at(id));
-    }
+//    if (_newDelete.count(id)) {
+//        return std::make_shared<Video>(_newDelete.at(id));
+//    }
 
     if (_oldClean.count(id)) {
         return std::make_shared<Video>(_oldClean.at(id));
@@ -136,14 +136,14 @@ std::shared_ptr<Video> VideoBroker::inCache(std::string id)
         return std::make_shared<Video>(_oldDirty.at(id));
     }
 
-    if (_oldDelete.count(id)) {
-        return std::make_shared<Video>(_oldDelete.at(id));
-    }
+//    if (_oldDelete.count(id)) {
+//        return std::make_shared<Video>(_oldDelete.at(id));
+//    }
 
     return nullptr;
 }
 
-int VideoBroker::judgeFrom(const std::string &id)
+int VideoBroker::judgeFromForDel(const std::string &id)
 {
     if (_newClean.count(id)) return 0;
     if (_newDirty.count(id)) return 1;

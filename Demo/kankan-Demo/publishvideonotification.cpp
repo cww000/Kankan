@@ -1,9 +1,14 @@
 #include "publishvideonotification.h"
 
 
-PublishVideoNotification::PublishVideoNotification(std::string id, long senderId, std::unordered_map<long, NetizenProxy> observer, std::string content, std::string time, std::string videoId) :
+PublishVideoNotification::PublishVideoNotification(std::string id, long senderId, std::unordered_map<long, NetizenProxy> observer, std::string content, std::string date, std::string videoId) :
     m_id{id}, m_senderId{senderId}, _observer{observer},
-    m_content{content}, m_time{time}, m_videoId{videoId}
+    m_content{content}, m_date{date}, m_videoId{videoId}
+{
+
+}
+
+PublishVideoNotification::PublishVideoNotification(std::string id, std::string content, std::string date, long senderId, std::string videoId) : m_id{id},  m_content{content}, m_date{date}, m_senderId{senderId}, m_videoId{videoId}
 {
 
 }

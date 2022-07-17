@@ -86,7 +86,7 @@ std::vector<std::string> Netizen::getInfo()
 void Netizen::comment(const std::string &content, const std::string &videoId)
 {
     //1. 生成comment id
-    std::string id = "";
+    std::string id = "0003";
 
     //2. 生成Comment对象
     Comment comment(id, content,videoId, m_id);
@@ -127,9 +127,10 @@ void Netizen::publishVideo(std::string description, std::string title, std::stri
     //6. 通知网民的所有的关注者
     std::string content="你关注的人有发布了新的稿件";
     std::string notiId = "2";
-    std::string time = "23314";
+    std::string date1 = "23314";
+
     //创建通知对象，并将对象添加到消息队列
-    MessageSequence::getInstance()->pushNotification(PublishVideoNotification(notiId, m_id, _fans, content, time, id));
+    MessageSequence::getInstance()->pushNotification(PublishVideoNotification(notiId, m_id, _fans, content, date1, id));
 
 }
 
@@ -210,19 +211,34 @@ void Netizen::checkOneMessage(const std::string &messageId)
 
     //查找该条消息所对应的通知中的稿件的id
     auto notification = MessageSequence::getInstance()->findById(messageId);
-    std::string videoId = notification->videoId();
+    if (notification != nullptr) {
+        std::string videoId = notification->videoId();
 
-    //删除消息列表中对应的某个消息中的这个观察者，下次将不再将消息发送给该网民
-    MessageSequence::getInstance()->removeMessageObserver(messageId, m_id);
+        //删除消息列表中对应的某个消息中的这个观察者，下次将不再将消息发送给该网民
+        MessageSequence::getInstance()->removeMessageObserver(messageId, m_id);
 
-    checkOneVideo(videoId);
+        checkOneVideo(videoId);
+    } else {
+        std::cerr << "消息不存在!" << std::endl;
+    }
+}
+
+void Netizen::updateAcountInfo(std::string key, std::string headPortrait, std::string nickname)
+{
+    //1. 首先修改网民当前当前账户信息
+    m_key = key;
+    m_headPortrait = headPortrait;
+    m_nickname = nickname;
+
+    //2. 修改数据库中的网民信息
+    NetizenBroker::getInstance()->updateAcountInfo(m_id, *this);
 }
 
 
 void Netizen::checkOneVideo(const std::string& videoId)
 {
     auto video = VideoBroker::getInstance()->getVideo(videoId);
-    std::cout << "get a video message\n";
+    std::cout << "get a video message: \n";
     video->getVideoInfo();
 }
 

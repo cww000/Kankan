@@ -35,7 +35,7 @@ private:
     static void cacheDel();  //删除数据库中的数据
     static void cacheUpdate();   //修改数据库中的数据
     static std::shared_ptr<Video> inCache(std::string id);   //判断是否在缓存中
-    int judgeFrom(const std::string& id);  //判断要删除的数据是在哪一个缓存
+    int judgeFromForDel(const std::string& id);  //判断要删除的数据是在哪一个缓存
 };
 
 #endif // VIDEOBROKER_H

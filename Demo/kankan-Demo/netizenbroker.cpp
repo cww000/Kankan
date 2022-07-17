@@ -53,9 +53,9 @@ std::shared_ptr<Netizen> NetizenBroker::inCache(long id)
         return std::make_shared<Netizen>(_newDirty.at(id));
     }
 
-    if (_newDelete.count(id)) {
-        return std::make_shared<Netizen>(_newDelete.at(id));
-    }
+//    if (_newDelete.count(id)) {
+//        return std::make_shared<Netizen>(_newDelete.at(id));
+//    }
 
     if (_oldClean.count(id)) {
         return std::make_shared<Netizen>(_oldClean.at(id));
@@ -65,16 +65,26 @@ std::shared_ptr<Netizen> NetizenBroker::inCache(long id)
         return std::make_shared<Netizen>(_oldDirty.at(id));
     }
 
-    if (_oldDelete.count(id)) {
-        return std::make_shared<Netizen>(_oldDelete.at(id));
-    }
+//    if (_oldDelete.count(id)) {
+//        return std::make_shared<Netizen>(_oldDelete.at(id));
+//    }
 
     return nullptr;
 }
 
+int NetizenBroker::judgeFromForUpdate(long id)
+{
+    if (_newClean.count(id)) return 0;  //如果在新的净缓存中
+    if (_newDirty.count(id)) return 1;
+    if (_oldDirty.count(id)) return 2;
+
+    return 3;  //在旧的净缓存中
+}
+
+
 void NetizenBroker::cacheFlush()
 {
-    if (!_newClean.empty() || !_newClean.empty()) {
+    if (!_newClean.empty() || !_newDirty.empty()) {
         std::string sql = "insert into user values";
         for(auto iter = _newClean.begin(); iter != _newClean.end();){
 
@@ -103,7 +113,7 @@ void NetizenBroker::cacheFlush()
         if (!sql.empty()) sql.pop_back();
         std::cout << sql << std::endl;
         insert(sql);   //执行批量插入，插入新的净缓存和新的脏缓存中的数据
-        }
+    }
 }
 void NetizenBroker::cacheDel()
 {
@@ -123,6 +133,7 @@ void NetizenBroker::cacheDel()
         std::lock_guard<std::mutex> lk(m_mutex);
 
         std::string sql = "delete from user where id=" + std::to_string(it->first);
+        std::cout << sql << std::endl;
         del(sql);
         //从对应缓存中删除相关数据
         //erase的返回值是一个迭代器，指向删除元素下一个元素。
@@ -131,7 +142,20 @@ void NetizenBroker::cacheDel()
 }
 void NetizenBroker::cacheUpdate()
 {
+    if (!_oldDirty.empty()) {
+        for (auto iter = _oldDirty.begin(); iter != _oldDirty.end();) {
+            //应该保证当进行插入时，数据是不可以被其他线程所更改的
+            std::lock_guard<std::mutex> lk(m_mutex);
 
+            std::string sql = "update user set user_key='"+ iter->second.key()+ "', user_nickname='"+ iter->second.nickname()+ "' where user_id=" + std::to_string(iter->first);
+
+            std::cout << sql << std::endl;
+            update(sql);
+            //从对应缓存中删除相关数据
+            //erase的返回值是一个迭代器，指向删除元素下一个元素。
+            _oldDirty.erase(iter++);
+        }
+    }
 }
 
 void NetizenBroker::flush()
@@ -230,6 +254,24 @@ std::vector<long> NetizenBroker::findNetizenFollowers(const long id)
 void NetizenBroker::addNetizen(long id, const Netizen &netizen)
 {
     _newClean.insert({id, netizen});
+}
+
+void NetizenBroker::updateAcountInfo(long id, const Netizen &netizen)
+{
+    int n = judgeFromForUpdate(id);
+    if (n == 0) {
+        _newClean.erase(id);    //删除新的净缓存中对应的网民数据
+        _newDirty.insert({id, netizen});   //添加新的网民数据到新的脏缓存中
+    } else if (n == 1) {
+        _newDirty.erase(id);    //替换新的脏缓存中原有对应网民的数据
+        _newDirty.insert({id, netizen});
+    } else if (n == 2) {
+        _oldDirty.erase(id);
+        _oldDirty.insert({id, netizen});   //替换旧的脏缓存中原有对应网民的数据
+    } else {
+        _oldClean.erase(id);
+        _oldDirty.insert({id, netizen});
+    }
 }
 
 
