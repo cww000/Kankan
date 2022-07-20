@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "commentinterface.h"
+#include "json.hpp"
 #include <string>
 
 class Comment;
@@ -14,7 +15,7 @@ public:
     ~CommentProxy();
 
     //返回评论的内容
-    std::string getCommentInfo(std::string id);
+    nlohmann::json getCommentInfo(std::string id);
 private:
     std::string m_id;
     std::shared_ptr<Comment> m_comment;

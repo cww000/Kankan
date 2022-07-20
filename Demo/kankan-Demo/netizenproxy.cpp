@@ -14,7 +14,7 @@ NetizenProxy::~NetizenProxy()
 
 }
 
-std::vector<std::string> NetizenProxy::getInfo(long id)
+nlohmann::json NetizenProxy::getInfo(long id)
 {
     if (m_netizen == nullptr)
         m_netizen = NetizenBroker::getInstance()->findNetizenById(id);

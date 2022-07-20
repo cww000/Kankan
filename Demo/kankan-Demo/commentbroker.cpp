@@ -56,7 +56,7 @@ std::shared_ptr<Comment> CommentBroker::retrieveComment(const std::string &id)
     }
 
     Comment com(parameters[0], parameters[1], parameters[2], user_id);
-    std::cout << "Comment对象实例化成功" << std::endl;
+ //   std::cout << "Comment对象实例化成功" << std::endl;
      _oldClean.insert({id, com});
 
      return std::make_shared<Comment>(_oldClean.at(id));

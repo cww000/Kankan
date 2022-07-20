@@ -18,7 +18,7 @@ insert into fan values(20220501, "quhu", 20220006, "zhangqingjun");
 
 insert into follower values(20220628, "zhuyoucheng", 20220501, "quhu");
 insert into follower values(20220522, "huchenxing", 20220628, "zhuyoucheng");
-insert into follower values(20220501, "quhu", 202205022, "huchenxing");
+insert into follower values(20220501, "quhu", 20220522, "huchenxing");
 insert into follower values(20220501, "quhu", 20220628, "zhuyoucheng");
 insert into follower values(20220006, "zhangqingjun", 20220501, "quhu");
 

@@ -52,35 +52,28 @@ Netizen::Netizen(long id, std::string nickname, std::string headPortrait, std::v
 
 void Netizen::init()
 {
-    //getVideoInfo如何存储返回的数据
     std::cout << "稿件信息：\n";
-    for (auto video : _videos){
-        video.second.getVideoInfo(video.first);
+    for (auto& video : _videos){
+        std::cout << video.second.getVideoInfo(video.first).dump(4) << std::endl;
     }
     std::cout << "粉丝信息：\n";
-    for (auto fan : _fans) {
-        fan.second.getInfo(fan.first);
+    for (auto& fan : _fans) {
+        std::cout << fan.second.getInfo(fan.first).dump(4) << std::endl;
     }
 
     std::cout << "关注者信息：\n";
-    for (auto follower : _followers) {
-        follower.second.getInfo(follower.first);
+    for (auto& follower : _followers) {
+        std::cout << follower.second.getInfo(follower.first).dump(4) << std::endl;
     }
 }
 
-std::vector<std::string> Netizen::getInfo()
+nlohmann::json Netizen::getInfo()
 {
-    std::vector<std::string> results;
-    results.push_back(m_headPortrait);
-    results.push_back(m_nickname);
-
-    //测试
-    std::cout << "NetizenInfo: " ;
-    for (auto g : results)
-        std::cout << g << "   ";
-    std::cout << "\n";
-
-    return results;
+    nlohmann::json netizen;
+    netizen["id"] = m_id;
+    netizen["nickname"] = m_nickname;
+    netizen["headPortrait"] = m_headPortrait;
+    return netizen;
 }
 
 void Netizen::comment(const std::string &content, const std::string &videoId)
@@ -103,25 +96,36 @@ void Netizen::comment(const std::string &content, const std::string &videoId)
 
 }
 
-void Netizen::publishVideo(std::string description, std::string title, std::string label, std::string subarea, bool isOriginal, std::string cover, std::string date, std::string videoFileId)
+void Netizen::publishVideo(nlohmann::json video)
 {
     //1. 生成Video的id
     std::string id ="0628_video";
     //新创建的稿件没有评论
     std::vector<std::string> comments;
-    //2. 构造Video对象
-    Video video(id, description, title, label, subarea, isOriginal, cover,
-                date, m_id, comments, videoFileId);
+    //2. 获取json中的数据
+    std::string description = video["description"].get<std::string>();
+    std::string title = video["title"].get<std::string>();
+    std::string label = video["label"].get<std::string>();
+    std::string subarea = video["subarea"].get<std::string>();
+    std::string isOri = video["isOriginal"].get<std::string>();
+    bool isOriginal;
+    std::istringstream(isOri) >> std::boolalpha >> isOriginal;
+    std::string cover = video["cover"].get<std::string>();
+    std::string date = video["date"].get<std::string>();
+    std::string videoFileId = video["videoFile"]["id"].get<std::string>();
+    
+    //3. 构造Video对象
+    Video v(id, description, title, label, subarea, isOriginal, cover, date, m_id, comments, videoFileId);
 
-    //3. 将video存入净缓存
-    VideoBroker::getInstance()->addVideo(id, video);
+    //4. 将video存入净缓存
+    VideoBroker::getInstance()->addVideo(id, v);
 
-    //4. 将videoFile对象存入净缓存
+    //5. 将videoFile对象存入净缓存
     //在这之前，还是需要一个VideoFile对象
     VideoFile videoFile(videoFileId, "www.Youchengzhu.com", id);
     VideoFileBroker::getInstance()->addVideoFile(videoFileId, videoFile);
 
-    //5. 建立稿件与网民的连接
+    //6. 建立稿件与网民的连接
     addNewVideo(id);
 
     //6. 通知网民的所有的关注者
@@ -129,7 +133,7 @@ void Netizen::publishVideo(std::string description, std::string title, std::stri
     std::string notiId = "2";
     std::string date1 = "23314";
 
-    //创建通知对象，并将对象添加到消息队列
+    //7. 创建通知对象，并将对象添加到消息队列
     MessageSequence::getInstance()->pushNotification(PublishVideoNotification(notiId, m_id, _fans, content, date1, id));
 
 }
@@ -204,6 +208,26 @@ void Netizen::updateMessage(const std::string &messageId)
     _message.insert(messageId);
 }
 
+void Netizen::browseMessage()
+{
+    if (!_message.empty()) {
+        nlohmann::json messages;
+        for (auto& mess : _message) {
+            nlohmann::json m;
+            auto notification = MessageSequence::getInstance()->findById(mess);
+            m["id"] = notification->id();
+            m["sendername"] = NetizenBroker::getInstance()->findNetizenById(notification->senderId())->nickname();
+            m["conetnt"] = notification->content();
+            m["date"] = notification->date();
+            messages.push_back(m);
+        }
+
+        std::cout << messages.dump(4) << std::endl;
+    } else {
+        std::cout << "什么消息也没有！！！！" << std::endl;
+    }
+}
+
 void Netizen::checkOneMessage(const std::string &messageId)
 {
     //将消息从网民的未读消息列表中删除
@@ -238,7 +262,6 @@ void Netizen::updateAcountInfo(std::string key, std::string headPortrait, std::s
 void Netizen::checkOneVideo(const std::string& videoId)
 {
     auto video = VideoBroker::getInstance()->getVideo(videoId);
-    std::cout << "get a video message: \n";
-    video->getVideoInfo();
+    std::cout << video->getVideoInfo().dump(4) << std::endl;
 }
 

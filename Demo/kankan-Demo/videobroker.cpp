@@ -74,7 +74,7 @@ std::shared_ptr<Video> VideoBroker::retrieveVideo(const std::string &id)
 
     Video v(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], isOriginal, parameters[5], parameters[6], user_id, commentIds, result);
 
-    std::cout << "Video对象实例化成功" << std::endl;
+  //  std::cout << "Video对象实例化成功" << std::endl;
 
     //将从数据库中读出来的数据添加到旧的净缓存
     _oldClean.insert({id, v});

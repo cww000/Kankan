@@ -34,6 +34,7 @@ HEADERS += \
     commentbroker.h \
     commentinterface.h \
     commentproxy.h \
+    json.hpp \
     messagesequence.h \
     mytimer.h \
     netizen.h \

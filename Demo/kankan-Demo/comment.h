@@ -3,6 +3,7 @@
 
 #include <string>
 #include "commentinterface.h"
+#include "json.hpp"
 
 class Comment : public CommentInterface
 {
@@ -15,6 +16,7 @@ public:
 
     const std::string videoId() const;
     long user_id() const;
+    nlohmann::json getCommentInfo();
 
 private:
     std::string m_id;        //评论id,利用时间生成

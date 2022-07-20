@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include "videofileinterface.h"
-
+#include "json.hpp"
 class VideoFile : public VideoFileInterface
 {
 public:
@@ -13,6 +13,7 @@ public:
     std::string getDuration(){ return m_duration; };   //返回视频的时长
     const std::string address() const;
     const std::string videoId() const;
+    nlohmann::json getVideoFileInfo();
 
 
 private:

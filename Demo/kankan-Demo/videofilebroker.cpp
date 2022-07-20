@@ -46,7 +46,7 @@ std::shared_ptr<VideoFile> VideoFileBroker::retrieveVideoFile(const std::string 
 
     VideoFile vf(parameters[0], parameters[1], parameters[2]);
     //返回videofile对象
-    std::cout << "VideoFile对象实例化成功" << std::endl;
+ //   std::cout << "VideoFile对象实例化成功" << std::endl;
     _oldClean.insert({id, vf});
     return std::make_shared<VideoFile>(_oldClean.at(id));
 }

@@ -7,6 +7,7 @@
 #include "videoproxy.h"
 #include "netizenproxy.h"
 #include "netizeninterface.h"
+#include "json.hpp"
 #include <vector>
 #include <set>
 class Netizen
@@ -31,12 +32,13 @@ public:
     void init();
 
     //返回网民的昵称和头像
-    std::vector<std::string> getInfo();
+    nlohmann::json getInfo();
 
     //评论
     void comment(const std::string& content, const std::string& videoId);
+
     //发布稿件
-    void publishVideo(std::string description, std::string title, std::string label, std::string subarea, bool isOriginal, std::string cover, std::string date, std::string videoFileId);
+    void publishVideo(nlohmann::json video);
     //关注
     void follow(long followerId);
 
@@ -57,16 +59,20 @@ public:
 
     //添加一条未查看消息
     void updateMessage(const std::string& messageId);
+
+    //浏览未读消息列表
+    void browseMessage();
     //选择查看某条消息
     void checkOneMessage(const std::string& messageId);
 
     //修改个人信息
     void updateAcountInfo(std::string key, std::string headPortrait, std::string nickname);
 
+    //选择查看某个稿件
+    void checkOneVideo(const std::string& videoId);
+
 
 private:
-
-    void checkOneVideo(const std::string& videoId);
     long m_id;                                                      //用户id
     std::string m_headPortrait;                                     //用户头像
     std::string m_key;                                              //用户密码

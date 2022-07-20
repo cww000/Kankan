@@ -9,7 +9,7 @@ VideoProxy::VideoProxy(std::string id) :
 
 }
 
-std::vector<std::string> VideoProxy::getVideoInfo(const std::string& id)
+nlohmann::json VideoProxy::getVideoInfo(const std::string& id)
 {
 
     if (m_video == nullptr)

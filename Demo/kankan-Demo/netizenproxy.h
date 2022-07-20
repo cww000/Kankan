@@ -2,8 +2,9 @@
 #define NETIZENPROXY_H
 
 #include <memory>
-#include "netizeninterface.h"
 #include <vector>
+#include "netizeninterface.h"
+#include "json.hpp"
 
 class Netizen;
 
@@ -13,7 +14,7 @@ public:
     NetizenProxy(long id);
     ~NetizenProxy();
 
-    std::vector<std::string> getInfo(long id);
+    nlohmann::json getInfo(long id);
     bool isOnline();
     void updateMessage(std::string messageId);
 private:
