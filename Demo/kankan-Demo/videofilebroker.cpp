@@ -4,10 +4,10 @@
 VideoFileBroker* VideoFileBroker::m_videoFileBroker = nullptr;
 std::mutex VideoFileBroker::m_mutex = {};
 std::unordered_map<std::string, VideoFile> VideoFileBroker::_newClean = {};
-//std::unordered_map<std::string, VideoFile> VideoFileBroker::_newDirty = {};
+std::unordered_map<std::string, VideoFile> VideoFileBroker::_newDirty = {};
 std::unordered_map<std::string, VideoFile> VideoFileBroker::_newDelete = {};
 std::unordered_map<std::string, VideoFile> VideoFileBroker::_oldClean = {};
-//std::unordered_map<std::string, VideoFile> VideoFileBroker::_oldDirty = {};
+std::unordered_map<std::string, VideoFile> VideoFileBroker::_oldDirty = {};
 std::unordered_map<std::string, VideoFile> VideoFileBroker::_oldDelete = {};
 
 VideoFileBroker::~VideoFileBroker()
@@ -58,28 +58,46 @@ void VideoFileBroker::addVideoFile(const std::string &id, const VideoFile &video
 
 void VideoFileBroker::deleteVideoFile(const std::string &id, const VideoFile &videoFile)
 {
-    int n = judgeFromForDel(id);
+    int n = judgeFrom(id);
     if (n == 0) {
-        //如果该评论对象是在新的净缓存中
-        //将该评论对象从新的净缓存移动到新的删除缓存
+        //如果该视频文件对象是在新的净缓存中
+        //将该视频文件对象从新的净缓存移动到新的删除缓存
         _newClean.erase(id);
         _newDelete.insert({id, videoFile});
-    } /*else if (n == 1){
-        //如果该评论对象是在新的脏缓存中
-        //将该评论对象从新的脏缓存移动到新的删除缓存
+    } else if (n == 1){
+        //如果该视频文件对象是在新的脏缓存中
+        //将该视频文件对象从新的脏缓存移动到新的删除缓存
         _newDirty.erase(id);
         _newDelete.insert({id, videoFile});
-    } */else if (n == 2) {
-          //如果该评论对象是在旧的净缓存中
-          //将该评论对象从旧的净缓存移动到旧的删除缓存
-        _oldClean.erase(id);
-        _oldDelete.insert({id, videoFile});
-    } /*else {
-        //如果该评论对象是在旧的脏缓存中
-        //将该评论对象从旧的脏缓存移动到旧的删除缓存
+    } else if (n == 2) {
+        //如果该视频文件对象是在旧的脏缓存中
+        //将该评论视频文件从旧的脏缓存移动到旧的删除缓存
         _oldDirty.erase(id);
         _oldDelete.insert({id, videoFile});
-    }*/
+    } else {
+        //如果该视频文件对象是在旧的净缓存中
+        //将该视频文件对象从旧的净缓存移动到旧的删除缓存
+      _oldClean.erase(id);
+      _oldDelete.insert({id, videoFile});
+    }
+}
+
+void VideoFileBroker::updateVideoFile(const std::string &id, const VideoFile &videoFile)
+{
+    int n = judgeFrom(id);
+    if (n == 0) {
+        _newClean.erase(id);    //删除新的净缓存中对应的数据
+        _newDirty.insert({id, videoFile});   //添加新的数据到新的脏缓存中
+    } else if (n == 1) {
+        _newDirty.erase(id);    //替换新的脏缓存中原有对应的数据
+        _newDirty.insert({id, videoFile});  //替换新的脏缓存中原有对应的数据
+    } else if (n == 2) {
+        _oldDirty.erase(id);  //删除旧的脏缓存中对应的数据
+        _oldDirty.insert({id, videoFile});   //替换旧的脏缓存中原有对应的数据
+    } else {
+        _oldClean.erase(id);
+        _oldDirty.insert({id, videoFile});
+    }
 }
 
 
@@ -91,9 +109,9 @@ std::shared_ptr<VideoFile> VideoFileBroker::inCache(std::string id)
         return std::make_shared<VideoFile>(_newClean.at(id));
     }
 
-//    if (_newDirty.count(id)) {
-//        return std::make_shared<VideoFile>(_newDirty.at(id));
-//    }
+    if (_newDirty.count(id)) {
+        return std::make_shared<VideoFile>(_newDirty.at(id));
+    }
 
 //    if (_newDelete.count(id)) {
 //        return std::make_shared<VideoFile>(_newDelete.at(id));
@@ -103,9 +121,9 @@ std::shared_ptr<VideoFile> VideoFileBroker::inCache(std::string id)
         return std::make_shared<VideoFile>(_oldClean.at(id));
     }
 
-//    if (_oldDirty.count(id)) {
-//        return std::make_shared<VideoFile>(_oldDirty.at(id));
-//    }
+    if (_oldDirty.count(id)) {
+        return std::make_shared<VideoFile>(_oldDirty.at(id));
+    }
 
 //    if (_oldDelete.count(id)) {
 //        return std::make_shared<VideoFile>(_oldDelete.at(id));
@@ -114,15 +132,13 @@ std::shared_ptr<VideoFile> VideoFileBroker::inCache(std::string id)
     return nullptr;
 }
 
-int VideoFileBroker::judgeFromForDel(const std::string &id)
+int VideoFileBroker::judgeFrom(const std::string &id)
 {
-    if (_newClean.count(id)) return 0;
-  //  if (_newDirty.count(id)) return 1;
-    if (_oldClean.count(id)) return 2;
-  //  if (_oldDirty.count(id)) return 3;
+    if (_newClean.count(id)) return 0;  //如果在新的净缓存中
+    if (_newDirty.count(id)) return 1;
+    if (_oldDirty.count(id)) return 2;
 
-    //此时要删除的数据在数据库中，则从数据库读取数据，并将其放到旧的净缓存中
-    return 2;
+    return 3;  //在旧的净缓存中
 }
 
 VideoFileBroker::VideoFileBroker()
@@ -132,7 +148,7 @@ VideoFileBroker::VideoFileBroker()
 
 void VideoFileBroker::cacheFlush()
 {
-    if (!_newClean.empty() /*|| !_newClean.empty()*/) {
+    if (!_newClean.empty() || !_newDirty.empty()) {
         std::string sql = "insert into videoFile values";
         for(auto iter = _newClean.begin(); iter != _newClean.end();){
 
@@ -146,17 +162,17 @@ void VideoFileBroker::cacheFlush()
             _newClean.erase(iter++);
         }
 
-//        for(auto it = _newDirty.begin(); it != _newDirty.end();){
+        for(auto it = _newDirty.begin(); it != _newDirty.end();){
 
-//            //应该保证当进行插入时，数据是不可以被其他线程所更改的
-//            std::lock_guard<std::mutex> lk(m_mutex);
+            //应该保证当进行插入时，数据是不可以被其他线程所更改的
+            std::lock_guard<std::mutex> lk(m_mutex);
 
-//            sql += "('" + it->first+ "','" + it->second.address() + "','" + it->second.videoId() + "'),";
+            sql += "('" + it->first+ "','" + it->second.address() + "','" + it->second.videoId() + "'),";
 
-//            //从对应缓存中删除相关数据
-//            //erase的返回值是一个迭代器，指向删除元素下一个元素。
-//            _newDirty.erase(it++);
-//        }
+            //从对应缓存中删除相关数据
+            //erase的返回值是一个迭代器，指向删除元素下一个元素。
+            _newDirty.erase(it++);
+        }
 
         if (!sql.empty()) sql.pop_back(); //去掉最后一个逗号
         std::cout << sql << std::endl;
@@ -164,10 +180,23 @@ void VideoFileBroker::cacheFlush()
     }
 }
 
-//void VideoFileBroker::cacheUpdate()
-//{
+void VideoFileBroker::cacheUpdate()
+{
+    if (!_oldDirty.empty()) {
+        for (auto iter = _oldDirty.begin(); iter != _oldDirty.end();) {
+            //应该保证当进行插入时，数据是不可以被其他线程所更改的
+            std::lock_guard<std::mutex> lk(m_mutex);
 
-//}
+            std::string sql = "update videoFile set address='"+ iter->second.address()+ "', videoId='"+ iter->second.videoId()+ "' where id='" + iter->first + "'";
+
+            std::cout << sql << std::endl;
+            update(sql);
+            //从对应缓存中删除相关数据
+            //erase的返回值是一个迭代器，指向删除元素下一个元素。
+            _oldDirty.erase(iter++);
+        }
+    }
+}
 
 void VideoFileBroker::cacheDel()
 {
@@ -201,5 +230,5 @@ void VideoFileBroker::flush()
 {
     cacheFlush();
     cacheDel();
-//    cacheUpdate();
+    cacheUpdate();
 }

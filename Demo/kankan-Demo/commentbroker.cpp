@@ -83,7 +83,7 @@ void CommentBroker::deleteComment(const std::string &id, const Comment &comment)
     }*/ else if (n == 2) {
           //如果该评论对象是在旧的净缓存中
           //将该评论对象从旧的净缓存移动到旧的删除缓存
-         _oldClean.erase(id);
+        _oldClean.erase(id);
         _oldDelete.insert({id, comment});
     }/* else {
         //如果该评论对象是在旧的脏缓存中

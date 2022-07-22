@@ -38,7 +38,7 @@ nlohmann::json Video::getVideoInfo()
    // json comment;
     int i = 0;
     for (auto& com : _comments) {
-        video["comment"][i] = com.second.getCommentInfo(com.first);
+        video["comments"][i] = com.second.getCommentInfo(com.first);
         ++i;
     }
     return video;

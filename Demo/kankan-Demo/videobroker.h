@@ -17,6 +17,7 @@ public:
     //添加到删除缓存
     void deleteVideo(const std::string& id, const Video& video);
 
+    void updateVideo(const std::string& videoId, const Video& video);
     //检索缓存以及数据库，返回video对象
     //id：稿件id
 
@@ -35,7 +36,7 @@ private:
     static void cacheDel();  //删除数据库中的数据
     static void cacheUpdate();   //修改数据库中的数据
     static std::shared_ptr<Video> inCache(std::string id);   //判断是否在缓存中
-    int judgeFromForDel(const std::string& id);  //判断要删除的数据是在哪一个缓存
+    int judgeFrom(const std::string& videoId); //判断要更新的数据是在哪一个缓存
 };
 
 #endif // VIDEOBROKER_H

@@ -51,6 +51,9 @@ public:
     //修改个人信息
     void updateAcountInfo(long netizenId, std::string key, std::string headPortrait, std::string nickname);
 
+    //修改网民自己的已发布稿件信息
+    void updateVideoInfo(long netizenId, nlohmann::json newVideo);
+
 private:
     static void flush();
     static void notificationFlush();

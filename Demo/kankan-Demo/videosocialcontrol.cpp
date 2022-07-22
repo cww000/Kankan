@@ -138,6 +138,12 @@ void VideoSocialControl::updateAcountInfo(long netizenId, std::string key, std::
     netizen->updateAcountInfo(key, headPortrait, nickname);
 }
 
+void VideoSocialControl::updateVideoInfo(long netizenId, nlohmann::json newVideo)
+{
+    auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
+    netizen->updateVideoInfo(newVideo);
+}
+
 void VideoSocialControl::flush()
 {
     NetizenBroker::getInstance()->flush();

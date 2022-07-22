@@ -13,7 +13,6 @@ int main()
     control.login(20220501, "quhu");
     control.login(20220006, "zhangqingjun");
 
-
     //网民查看某个稿件
     control.checkOneVideo(20220501, "0628_video");
 
@@ -41,6 +40,21 @@ int main()
     //某个网民修改自己的个人信息
     control.updateAcountInfo(20220522, "huchengxing", "www.com","huchenxing");
 
+    //某个网民修改自己的已发布的某个稿件的信息
+    nlohmann::json newVideo;
+    newVideo["id"] = "0628_video";
+    newVideo["description"] = "food_ismn";
+    newVideo["title"] = "rnmCQNU";
+    newVideo["label"] = "food";
+    newVideo["subarea"] = "food";
+    newVideo["isOriginal"] = "true";
+    newVideo["cover"] = "www.taobao.com";
+    newVideo["date"] = "2022-07-22";
+    newVideo["user_id"] = 20220628;
+    newVideo["videoFile"]["id"] = "0628_";
+    control.updateVideoInfo(20220628, newVideo);
+
+
     //关注
     control.follow(20220006, 20220628);
 
@@ -48,7 +62,7 @@ int main()
     control.commentVideo("这个视频可真有意思！！", 20220006, "0628_video");
 
     //  control.login(1657854523, "chengwenwen");
-    //control.login("lwc");
+    control.login("lwc");
 
     return 0;
 }

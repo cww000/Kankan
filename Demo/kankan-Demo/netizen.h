@@ -67,6 +67,8 @@ public:
 
     //修改个人信息
     void updateAcountInfo(std::string key, std::string headPortrait, std::string nickname);
+    //修改已发布稿件信息
+    void updateVideoInfo(nlohmann::json newVideo);
 
     //选择查看某个稿件
     void checkOneVideo(const std::string& videoId);

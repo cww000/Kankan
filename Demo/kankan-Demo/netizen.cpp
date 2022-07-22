@@ -32,39 +32,49 @@ Netizen::Netizen(long id, std::string nickname, std::string headPortrait, std::v
 {
     for (auto vId : videosId) {
         _videos.insert(std::make_pair(vId, VideoProxy(vId)));
-        std::cout << "稿件id：" ;
-        std::cout << vId << std::endl;
+//        std::cout << "稿件id：" ;
+//        std::cout << vId << std::endl;
     }
 
     for (auto fanId : fansId) {
         _fans.insert(std::make_pair(fanId, NetizenProxy(fanId)));
-        std::cout << "粉丝id：" ;
-        std::cout << fanId << std::endl;
+//        std::cout << "粉丝id：" ;
+//        std::cout << fanId << std::endl;
     }
 
     for (auto followerId : followersId) {
         _followers.insert(std::make_pair(followerId, NetizenProxy(followerId)));
-        std::cout << "关注者id：";
-        std::cout << followerId << std::endl;
+//        std::cout << "关注者id：";
+//        std::cout << followerId << std::endl;
     }
 
 }
 
 void Netizen::init()
 {
-    std::cout << "稿件信息：\n";
+    nlohmann::json netizenInfo;
+    netizenInfo["id"] = m_id;
+    netizenInfo["nickname"] = m_nickname;
+    netizenInfo["headPortrait"] = m_headPortrait;
     for (auto& video : _videos){
-        std::cout << video.second.getVideoInfo(video.first).dump(4) << std::endl;
+        nlohmann::json v = video.second.getVideoInfo(video.first);
+        netizenInfo["videos"].push_back(v);
     }
-    std::cout << "粉丝信息：\n";
-    for (auto& fan : _fans) {
-        std::cout << fan.second.getInfo(fan.first).dump(4) << std::endl;
-    }
+    if (_videos.size() == 0) netizenInfo["videos"] = "";
 
-    std::cout << "关注者信息：\n";
-    for (auto& follower : _followers) {
-        std::cout << follower.second.getInfo(follower.first).dump(4) << std::endl;
+    for (auto& fan : _fans) {
+        nlohmann::json f = fan.second.getInfo(fan.first);
+        netizenInfo["fans"].push_back(f);
     }
+    if (_fans.size() == 0) netizenInfo["fans"] = "";
+
+    for (auto& follower : _followers) {
+        nlohmann::json f = follower.second.getInfo(follower.first);
+        netizenInfo["followers"].push_back(f);
+    }
+    if (_followers.size() == 0) netizenInfo["followers"] = "";
+
+    std::cout << netizenInfo.dump(4) << std::endl;
 }
 
 nlohmann::json Netizen::getInfo()
@@ -235,16 +245,12 @@ void Netizen::checkOneMessage(const std::string &messageId)
 
     //查找该条消息所对应的通知中的稿件的id
     auto notification = MessageSequence::getInstance()->findById(messageId);
-    if (notification != nullptr) {
-        std::string videoId = notification->videoId();
+    std::string videoId = notification->videoId();
 
-        //删除消息列表中对应的某个消息中的这个观察者，下次将不再将消息发送给该网民
-        MessageSequence::getInstance()->removeMessageObserver(messageId, m_id);
+    //删除消息列表中对应的某个消息中的这个观察者，下次将不再将消息发送给该网民
+    MessageSequence::getInstance()->removeMessageObserver(messageId, m_id);
 
-        checkOneVideo(videoId);
-    } else {
-        std::cerr << "消息不存在!" << std::endl;
-    }
+    checkOneVideo(videoId);
 }
 
 void Netizen::updateAcountInfo(std::string key, std::string headPortrait, std::string nickname)
@@ -256,6 +262,43 @@ void Netizen::updateAcountInfo(std::string key, std::string headPortrait, std::s
 
     //2. 修改数据库中的网民信息
     NetizenBroker::getInstance()->updateAcountInfo(m_id, *this);
+}
+
+void Netizen::updateVideoInfo(nlohmann::json newVideo)
+{
+    //1.获取要修改的 videoId 和 videoFileId
+    std::string videoId = newVideo["id"].get<std::string>();
+    std::string videoFileId = newVideo["videoFile"]["id"].get<std::string>();
+
+    //2. 获取原video对象和 VideoFile对象
+    auto video = VideoBroker::getInstance()->getVideo(videoId);
+    auto videoFile = VideoFileBroker::getInstance()->getVideoFile(videoFileId);
+    //获取原video对象中评论的id
+    std::vector<std::string> comments;
+    for (auto& com : video->comments()) {
+        comments.push_back(com.first);
+    }
+
+    //3. 获取json中的数据
+    std::string description = newVideo["description"].get<std::string>();
+    std::string title = newVideo["title"].get<std::string>();
+    std::string label = newVideo["label"].get<std::string>();
+    std::string subarea = newVideo["subarea"].get<std::string>();
+    std::string isOri = newVideo["isOriginal"].get<std::string>();
+    bool isOriginal;
+    std::istringstream(isOri) >> std::boolalpha >> isOriginal;
+    std::string cover = newVideo["cover"].get<std::string>();
+    std::string date = newVideo["date"].get<std::string>();
+
+    //4. 构造新的Video对象
+    Video v(videoId, description, title, label, subarea, isOriginal, cover, date, m_id, comments, videoFileId);
+    //构造 VideoFile 对象
+    VideoFile vf(videoFileId, "www.taobao.com", videoId);
+
+    //5. 修改数据库中对应的稿件信息
+    VideoBroker::getInstance()->updateVideo(videoId, v);
+    // 修改数据库中对应的视频文件信息
+    VideoFileBroker::getInstance()->updateVideoFile(videoFileId, vf);
 }
 
 
