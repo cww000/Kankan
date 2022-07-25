@@ -44,7 +44,6 @@ std::shared_ptr<Video> VideoBroker::retrieveVideo(const std::string &id)
     std::shared_ptr<sql::ResultSet> res = query(sql);
     std::vector<std::string> parameters;
     bool isOriginal = false;
-    long user_id = 0;
     while (res->next()) {
         parameters.push_back(res->getString(1).c_str());    //稿件id
         parameters.push_back(res->getString(2).c_str());    //稿件描述
@@ -54,7 +53,7 @@ std::shared_ptr<Video> VideoBroker::retrieveVideo(const std::string &id)
         isOriginal = res->getBoolean(6);                    //是否为原创
         parameters.push_back(res->getString(7).c_str());    //封面
         parameters.push_back(res->getString(8).c_str());    //发布日期
-        user_id = res->getLong(9);
+        parameters.push_back(res->getString(9).c_str());    //发布者id
     }
 
 
@@ -72,7 +71,7 @@ std::shared_ptr<Video> VideoBroker::retrieveVideo(const std::string &id)
     while (res->next())
         result = res->getString(1).c_str();
 
-    Video v(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], isOriginal, parameters[5], parameters[6], user_id, commentIds, result);
+    Video v(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], isOriginal, parameters[5], parameters[6], parameters[7], commentIds, result);
 
   //  std::cout << "Video对象实例化成功" << std::endl;
 
@@ -88,25 +87,25 @@ void VideoBroker::addVideo(const std::string &id, const Video &video)
 
 void VideoBroker::deleteVideo(const std::string &id, const Video &video)
 {
-    int n = judgeFrom(id);
+    int n = judgeFrom(id);     //判断稿件是在哪一个缓存
     if (n == 0) {
-        //如果该评论对象是在新的净缓存中
-        //将该评论对象从新的净缓存移动到新的删除缓存
+        //如果该对象是在新的净缓存中
+        //将该对象从新的净缓存移动到新的删除缓存
         _newClean.erase(id);
         _newDelete.insert({id, video});
     } else if (n == 1){
-        //如果该评论对象是在新的脏缓存中
-        //将该评论对象从新的脏缓存移动到新的删除缓存
+        //如果该对象是在新的脏缓存中
+        //将该对象从新的脏缓存移动到新的删除缓存
         _newDirty.erase(id);
         _newDelete.insert({id, video});
     } else if (n == 2) {
-        //如果该评论对象是在旧的脏缓存中
-        //将该评论对象从旧的脏缓存移动到旧的删除缓存
+        //如果该对象是在旧的脏缓存中
+        //将该对象从旧的脏缓存移动到旧的删除缓存
         _oldDirty.erase(id);
         _oldDelete.insert({id, video});
     } else {
-        //如果该评论对象是在旧的净缓存中
-        //将该评论对象从旧的净缓存移动到旧的删除缓存
+        //如果该对象是在旧的净缓存中
+        //将该对象从旧的净缓存移动到旧的删除缓存
         _oldClean.erase(id);
         _oldDelete.insert({id, video});
     }
@@ -191,7 +190,7 @@ void VideoBroker::cacheFlush()
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
             std::lock_guard<std::mutex> lk(m_mutex);
 
-            sql += "('"+ iter->first+ "','"+ iter->second.description()+ "','"+ iter->second.title() + "','" + iter->second.label() + "','" + iter->second.subarea() + "','" + std::to_string(iter->second.isOriginal()) + "','" + iter->second.cover() + "','" + iter->second.date() + "'," + std::to_string(iter->second.user_id()) + "),";
+            sql += "('"+ iter->first+ "','"+ iter->second.description()+ "','"+ iter->second.title() + "','" + iter->second.label() + "','" + iter->second.subarea() + "','" + std::to_string(iter->second.isOriginal()) + "','" + iter->second.cover() + "','" + iter->second.date() + "','" + iter->second.user_id() + "'),";
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。
@@ -203,7 +202,7 @@ void VideoBroker::cacheFlush()
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
             std::lock_guard<std::mutex> lk(m_mutex);
 
-            sql += "('"+ it->first+ "','"+ it->second.description()+ "','"+ it->second.title() + "','" + it->second.label() + "','" + it->second.subarea() + "','" + std::to_string(it->second.isOriginal()) + "','" + it->second.cover() + "','" + it->second.date() + "'," + std::to_string(it->second.user_id()) + "),";
+            sql += "('"+ it->first+ "','"+ it->second.description()+ "','"+ it->second.title() + "','" + it->second.label() + "','" + it->second.subarea() + "','" + std::to_string(it->second.isOriginal()) + "','" + it->second.cover() + "','" + it->second.date() + "','" + it->second.user_id() + "'),";
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。
@@ -249,7 +248,7 @@ void VideoBroker::cacheUpdate()
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
             std::lock_guard<std::mutex> lk(m_mutex);
 
-            std::string sql = "update video set description='"+ iter->second.description()+ "', title='"+ iter->second.title() + "', label='" + iter->second.label() + "', subarea='" + iter->second.subarea() + "', isOriginal='" + std::to_string(iter->second.isOriginal()) + "', cover='" + iter->second.cover() + "', date='" + iter->second.date()+ "', user_id=" + std::to_string(iter->second.user_id()) + " where id='" + iter->first + "'";
+            std::string sql = "update video set description='"+ iter->second.description()+ "', title='"+ iter->second.title() + "', label='" + iter->second.label() + "', subarea='" + iter->second.subarea() + "', isOriginal='" + std::to_string(iter->second.isOriginal()) + "', cover='" + iter->second.cover() + "', date='" + iter->second.date()+ "', user_id='" + iter->second.user_id() + "' where id='" + iter->first + "'";
 
             std::cout << sql << std::endl;
             update(sql);

@@ -14,14 +14,14 @@ MessageSequence::MessageSequence()
     std::string sql = "select * from message";
     std::shared_ptr<sql::ResultSet> res = query(sql);
     std::vector<std::string> parameters;
-    long senderId;
+    std::string senderId;
     while (res->next()) {
         parameters.push_back(res->getString(1).c_str());
         parameters.push_back(res->getString(2).c_str());
         parameters.push_back(res->getString(3).c_str());
-        senderId = res->getLong(4);
+         parameters.push_back(res->getString(4).c_str());
         parameters.push_back(res->getString(5).c_str());
-        m_messageQueue.insert({parameters[0], PublishVideoNotification(parameters[0], parameters[1], parameters[2], senderId, parameters[3])});
+        m_messageQueue.insert({parameters[0], PublishVideoNotification(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4] )});
     }
 
      //2. 将每条消息对应的接收者注册为观察者
@@ -29,7 +29,7 @@ MessageSequence::MessageSequence()
         sql = "select fanId from send where messageId='" + message.first + "'";
         res = query(sql);
         while (res->next()) {
-            message.second.registerObserver(res->getLong(1));
+            message.second.registerObserver(res->getString(1).c_str());
         }
     }
 }
@@ -54,13 +54,13 @@ void MessageSequence::pushNotification(PublishVideoNotification notification)
     m_messageQueue.insert({notification.id(), notification});
 
     //2.将消息存入数据库
-    std::string sql = "insert into message values('" + notification.id() + "','" + notification.content() + "','" + notification.date() + "'," + std::to_string(notification.senderId()) + ",'" + notification.videoId() + "')";
+    std::string sql = "insert into message values('" + notification.id() + "','" + notification.content() + "','" + notification.date() + "','" + notification.senderId() + "','" + notification.videoId() + "')";
     std::cout << sql << std::endl;
     insert(sql);
 
     //3.将消息相关联的粉丝存入数据库
     for (auto& ob : notification.observer()) {
-        sql = "insert into send values('" + notification.id() + "'," + std::to_string(ob.first) + ")";
+        sql = "insert into send values('" + notification.id() + "','" + ob.first + "')";
         std::cout << sql << std::endl;
         insert(sql);
     }
@@ -98,17 +98,17 @@ void MessageSequence::updateMessageQueue()
         sql = "select fanId from send where messageId='" + message.first + "'";
         res = query(sql);
         while (res->next()) {
-            long id = res->getLong(1);
+            std::string id = res->getString(1).c_str();
             //删除数据库中对应的在消息队列的某条消息中已被删除的观察者
             if (message.second.observer().count(id) == 0) {
-                sql = "delete from send where fanId=" + std::to_string(id) + " and messageId='" + message.first + "'";
+                sql = "delete from send where fanId='" + id + "' and messageId='" + message.first + "'";
                 del(sql);
             }
         }
     }
 }
 
-void MessageSequence::removeMessageObserver(std::string messageId, long observerId)
+void MessageSequence::removeMessageObserver(std::string messageId, std::string observerId)
 {
     //删除消息队列中指定message的某个观察者（即已查阅了该message的netizen）
     m_messageQueue.at(messageId).removeObserver(observerId);

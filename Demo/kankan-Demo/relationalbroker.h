@@ -1,9 +1,22 @@
+// Copyright (C) Microsoft. All rights reserved. License (BSD/MIT/GPL)
+// Project: kankan-Demo
+//
+// Author: Wenwen Cheng WennCheng@163.com)
+// Date: 2022-07-25
+// Version: 0.1.0
+//
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Project description: kankan is a multimedia social platform based on video, and it is mainly for those who want to create and share, or spend their free time. It mainly provides people with the opportunity to disseminate videos and watch videos.
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//This file is part of kankan-Demo.
+// History:
+// 1.Modified by Wenwen Cheng (WennCheng@163.com) 2022-07-25
+//   Description: 建立数据库连接，添加数据库的增删查改操作
 #ifndef RELATIONALBROKER_H
 #define RELATIONALBROKER_H
 
 #include <unordered_map>
 #include <mariadb/conncpp.hpp>
-#include "cache.h"
 
 class RelationalBroker
 {

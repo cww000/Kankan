@@ -8,7 +8,6 @@ unix|win32: LIBS += -lpthread
 
 
 SOURCES += \
-        cache.cpp \
         comment.cpp \
         commentbroker.cpp \
         commentproxy.cpp \
@@ -29,17 +28,14 @@ SOURCES += \
         videosocialcontrol.cpp
 
 HEADERS += \
-    cache.h \
     comment.h \
     commentbroker.h \
-    commentinterface.h \
     commentproxy.h \
     json.hpp \
     messagesequence.h \
     mytimer.h \
     netizen.h \
     netizenbroker.h \
-    netizeninterface.h \
     netizenproxy.h \
     publishvideonotification.h \
     relationalbroker.h \
@@ -47,8 +43,6 @@ HEADERS += \
     videobroker.h \
     videofile.h \
     videofilebroker.h \
-    videofileinterface.h \
     videofileproxy.h \
-    videointerface.h \
     videoproxy.h \
     videosocialcontrol.h

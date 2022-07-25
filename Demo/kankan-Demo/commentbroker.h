@@ -1,3 +1,18 @@
+// Copyright (C) Microsoft. All rights reserved. License (BSD/MIT/GPL)
+// Project: kankan-Demo
+//
+// Author: Wenwen Cheng WennCheng@163.com)
+// Date: 2022-07-25
+// Version: 0.1.0
+//
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Project description: kankan is a multimedia social platform based on video, and it is mainly for those who want to create and share, or spend their free time. It mainly provides people with the opportunity to disseminate videos and watch videos.
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//This file is part of kankan-Demo.
+// History:
+// 1.Modified by Wenwen Cheng (WennCheng@163.com) 2022-07-25
+//   Description: 利用评论的代管者（只有单例），去操纵数据库，从数据库中获取评论的相关数据，生成评论对象，并放到缓存中或者返回给评论的代理。当添加评论到数据库或者需要删除数据库中的某条评论时，也需要利用到其中的六个缓存，将对应的数据加到缓存中。但由于评论不需要修改，因此新的脏缓存和旧的脏缓存应该不需要。并且控制器对象定时刷新每个代管者中的几个缓存，利用缓存中的数据写数据库。
+
 #ifndef COMMENTBROKER_H
 #define COMMENTBROKER_H
 

@@ -10,10 +10,10 @@
 #include "netizenbroker.h"
 #include "videofilebroker.h"
 
-Netizen::Netizen(long id, std::string key) :
+Netizen::Netizen(std::string id, std::string key) :
     m_id{id}, m_key{key}
 {
-        m_nickname = "kk_" + std::to_string(id);     //生成默认用户名
+        m_nickname = "kk_" + id;     //生成默认用户名
 }
 
 Netizen::~Netizen()
@@ -23,11 +23,11 @@ Netizen::~Netizen()
 
 std::string Netizen::insertSql()
 {
-    return "insert into user values( " + std::to_string(m_id) + ", '" + m_key + "', '" + m_nickname + "');";
+    return "insert into user values( '" + m_id + "', '" + m_key + "', '" + m_nickname + "');";
 }
 
-Netizen::Netizen(long id, std::string nickname, std::string headPortrait, std::vector<std::string> videosId,
-                 std::vector<long> fansId, std::vector<long> followersId) :
+Netizen::Netizen(std::string id, std::string nickname, std::string headPortrait, std::vector<std::string> videosId,
+                 std::vector<std::string> fansId, std::vector<std::string> followersId) :
     m_id{id}, m_headPortrait{headPortrait}, m_key{" "}, m_nickname{nickname}
 {
     for (auto vId : videosId) {
@@ -138,6 +138,8 @@ void Netizen::publishVideo(nlohmann::json video)
     //6. 建立稿件与网民的连接
     addNewVideo(id);
 
+    std::cout << "发布视频成功\n";
+
     //6. 通知网民的所有的关注者
     std::string content="你关注的人有发布了新的稿件";
     std::string notiId = "2";
@@ -148,14 +150,14 @@ void Netizen::publishVideo(nlohmann::json video)
 
 }
 
-void Netizen::follow(long followerId)
+void Netizen::follow(std::string followerId)
 {
     //实例化被关注者
     auto follower = NetizenBroker::getInstance()->findNetizenById(followerId);
 
     //在网民和他想要关注的人之间建立联系（网民与关注者）
     _followers.insert({followerId, NetizenProxy(followerId)});
-    std::string sql = "insert into follower values(" + std::to_string(m_id) + ",'" + m_nickname + "'," + std::to_string(followerId) + ",'" + follower->nickname() + "')";
+    std::string sql = "insert into follower values('" + m_id + "','" + m_nickname + "','" + followerId + "','" + follower->nickname() + "')";
     std::cout << sql << std::endl;
     NetizenBroker::getInstance()->insert(sql);
 
@@ -166,10 +168,10 @@ void Netizen::follow(long followerId)
 
 }
 
-void Netizen::addFan(long fanId, const Netizen* fan)
+void Netizen::addFan(std::string fanId, const Netizen* fan)
 {
     _fans.insert({fanId, NetizenProxy(fanId)});
-    std::string sql = "insert into fan values(" + std::to_string(m_id) + ",'" + m_nickname + "'," + std::to_string(fanId) + ",'" + fan->nickname() + "')";
+    std::string sql = "insert into fan values('" + m_id + "','" + m_nickname + "','" + fanId + "','" + fan->nickname() + "')";
     std::cout << sql << std::endl;
     NetizenBroker::getInstance()->insert(sql);
 }
@@ -195,6 +197,8 @@ void Netizen::deleteVideo(const std::string &videoId)
     //5.将稿件和视频文件加入对应新的或者旧的删除缓存
     VideoFileBroker::getInstance()->deleteVideoFile(video->videoFile().first , *videoFile);
     VideoBroker::getInstance()->deleteVideo(videoId, *video);
+
+    std::cout << "删除视频成功\n";
 
 }
 
@@ -285,8 +289,11 @@ void Netizen::updateVideoInfo(nlohmann::json newVideo)
     std::string label = newVideo["label"].get<std::string>();
     std::string subarea = newVideo["subarea"].get<std::string>();
     std::string isOri = newVideo["isOriginal"].get<std::string>();
+
+    //将 string 转换为 bool
     bool isOriginal;
     std::istringstream(isOri) >> std::boolalpha >> isOriginal;
+
     std::string cover = newVideo["cover"].get<std::string>();
     std::string date = newVideo["date"].get<std::string>();
 

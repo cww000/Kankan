@@ -18,7 +18,6 @@ VideoSocialControl::VideoSocialControl()
 VideoSocialControl::~VideoSocialControl()
 {
 
-
 }
 
 //注册
@@ -26,9 +25,9 @@ void VideoSocialControl::login(std::string key)
 {
     //1. 生成帐号
     time_t result = time(NULL);
-    long id{0};
+    std::string id;
     if (result != (time_t)(-1))
-        id = result;    //系统根据时间分配id
+        id = std::to_string(result);    //系统根据时间分配id
 
     //2. 生成netizen对象，并将netizen对象存入缓存
     Netizen netizen(id, key);
@@ -42,7 +41,7 @@ void VideoSocialControl::login(std::string key)
 }
 
 //登录
-void VideoSocialControl::login(long id, std::string key)
+void VideoSocialControl::login(std::string id, std::string key)
 {
     if (NetizenBroker::getInstance()->qualifyNetizenId(id)) {
         std::cout << "用户id存在" << std::endl;
@@ -79,7 +78,7 @@ void VideoSocialControl::getSomeVideos(std::vector<std::string> ids)
 
 }
 
-void VideoSocialControl::checkOneVideo(long netizenId, std::string videoId)
+void VideoSocialControl::checkOneVideo(std::string netizenId, std::string videoId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->checkOneVideo(videoId);
@@ -95,50 +94,50 @@ std::string VideoSocialControl::mergeVideoFiles(std::vector<std::string> videoFi
 
 }
 
-void VideoSocialControl::createVideo(long netizenId, nlohmann::json video)
+void VideoSocialControl::createVideo(std::string netizenId, nlohmann::json video)
 {
     //如果确认发布稿件
      auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
      netizen->publishVideo(video);
 }
 
-void VideoSocialControl::deleteVideo(long netizenId, const std::string &videoId)
+void VideoSocialControl::deleteVideo(std::string netizenId, const std::string &videoId)
 {
     auto netizen = NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->deleteVideo(videoId);
 }
 
-void VideoSocialControl::commentVideo(const std::string &content, long netizenId, const std::string videoId)
+void VideoSocialControl::commentVideo(const std::string &content, std::string netizenId, const std::string videoId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->comment(content, videoId);
 }
 
-void VideoSocialControl::follow(long netizenId, long followerId)
+void VideoSocialControl::follow(std::string netizenId, std::string followerId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->follow(followerId);
 }
 
-void VideoSocialControl::browseMessage(long netizenId)
+void VideoSocialControl::browseMessage(std::string netizenId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->browseMessage();
 }
 
-void VideoSocialControl::checkOneMessage(long netizenId, std::string messageId)
+void VideoSocialControl::checkOneMessage(std::string netizenId, std::string messageId)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->checkOneMessage(messageId);
 }
 
-void VideoSocialControl::updateAcountInfo(long netizenId, std::string key, std::string headPortrait, std::string nickname)
+void VideoSocialControl::updateAcountInfo(std::string netizenId, std::string key, std::string headPortrait, std::string nickname)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->updateAcountInfo(key, headPortrait, nickname);
 }
 
-void VideoSocialControl::updateVideoInfo(long netizenId, nlohmann::json newVideo)
+void VideoSocialControl::updateVideoInfo(std::string netizenId, nlohmann::json newVideo)
 {
     auto netizen=NetizenBroker::getInstance()->findNetizenById(netizenId);
     netizen->updateVideoInfo(newVideo);

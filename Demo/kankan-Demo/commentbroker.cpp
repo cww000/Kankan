@@ -47,15 +47,14 @@ std::shared_ptr<Comment> CommentBroker::retrieveComment(const std::string &id)
     std::string sql = "select * from comment where id = '" + id + "'";
     std::shared_ptr<sql::ResultSet> res = query(sql);
     std::vector<std::string> parameters;
-    long user_id = 0;
     while (res->next()) {
         parameters.push_back(res->getString(1).c_str());
         parameters.push_back(res->getString(2).c_str());
         parameters.push_back(res->getString(3).c_str());
-        user_id = res->getLong(4);
+        parameters.push_back(res->getString(4).c_str());
     }
 
-    Comment com(parameters[0], parameters[1], parameters[2], user_id);
+    Comment com(parameters[0], parameters[1], parameters[2], parameters[3]);
  //   std::cout << "Comment对象实例化成功" << std::endl;
      _oldClean.insert({id, com});
 
@@ -102,7 +101,7 @@ void CommentBroker::cacheFlush()
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
             std::lock_guard<std::mutex> lk(m_mutex);
 
-            sql += "('" + iter->first+ "','" + iter->second.getText() + "','" + iter->second.videoId() + "'," + std::to_string(iter->second.user_id()) + "),";
+            sql += "('" + iter->first+ "','" + iter->second.getText() + "','" + iter->second.videoId() + "','" + iter->second.user_id() + "'),";
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。

@@ -4,12 +4,12 @@
 
 NetizenBroker* NetizenBroker::m_netizenBroker = nullptr;
 std::mutex NetizenBroker::m_mutex = {};
-std::unordered_map<long, Netizen> NetizenBroker::_newClean = {};
-std::unordered_map<long, Netizen> NetizenBroker::_newDirty = {};
-std::unordered_map<long, Netizen> NetizenBroker::_newDelete = {};
-std::unordered_map<long, Netizen> NetizenBroker::_oldClean = {};
-std::unordered_map<long, Netizen> NetizenBroker::_oldDirty = {};
-std::unordered_map<long, Netizen> NetizenBroker::_oldDelete = {};
+std::unordered_map<std::string, Netizen> NetizenBroker::_newClean = {};
+std::unordered_map<std::string, Netizen> NetizenBroker::_newDirty = {};
+std::unordered_map<std::string, Netizen> NetizenBroker::_newDelete = {};
+std::unordered_map<std::string, Netizen> NetizenBroker::_oldClean = {};
+std::unordered_map<std::string, Netizen> NetizenBroker::_oldDirty = {};
+std::unordered_map<std::string, Netizen> NetizenBroker::_oldDelete = {};
 
 NetizenBroker::NetizenBroker()
 {
@@ -28,20 +28,20 @@ NetizenBroker *NetizenBroker::getInstance()
     return m_netizenBroker;
 }
 
-bool NetizenBroker::qualifyNetizenId(long id)
+bool NetizenBroker::qualifyNetizenId(std::string id)
 {
     //根据id查找,如果找到返回true,否则返回false
     std::string sql = "select user_id from user";
     std::shared_ptr<sql::ResultSet> res = query(sql);
     while (res->next()) {
-        if (id == res->getInt(1))
+        if (id == res->getString(1).c_str())
             return true;
     }
 
     return false;
 }
 
-std::shared_ptr<Netizen> NetizenBroker::inCache(long id)
+std::shared_ptr<Netizen> NetizenBroker::inCache(std::string id)
 {
     //判断是否在缓存中
 
@@ -72,7 +72,7 @@ std::shared_ptr<Netizen> NetizenBroker::inCache(long id)
     return nullptr;
 }
 
-int NetizenBroker::judgeFromForUpdate(long id)
+int NetizenBroker::judgeFrom(std::string id)
 {
     if (_newClean.count(id)) return 0;  //如果在新的净缓存中
     if (_newDirty.count(id)) return 1;
@@ -91,7 +91,7 @@ void NetizenBroker::cacheFlush()
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
             std::lock_guard<std::mutex> lk(m_mutex);
 
-            sql += "(" + std::to_string(iter->first) + ",'"+ iter->second.key()+ "','"+ iter->second.nickname()+ "'),";
+            sql += "('" + iter->first + "','"+ iter->second.key()+ "','"+ iter->second.nickname()+ "'),";
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。
@@ -103,7 +103,7 @@ void NetizenBroker::cacheFlush()
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
             std::lock_guard<std::mutex> lk(m_mutex);
 
-            sql += "("+ std::to_string(it->first) + ",'" + it->second.key() + "','" + it->second.nickname() + "'),";
+            sql += "('"+ it->first + "','" + it->second.key() + "','" + it->second.nickname() + "'),";
 
             //从对应缓存中删除相关数据
             //erase的返回值是一个迭代器，指向删除元素下一个元素。
@@ -132,7 +132,7 @@ void NetizenBroker::cacheDel()
         //应该保证当进行插入时，数据是不可以被其他线程所更改的
         std::lock_guard<std::mutex> lk(m_mutex);
 
-        std::string sql = "delete from user where id=" + std::to_string(it->first);
+        std::string sql = "delete from user where id='" + it->first + "'";
         std::cout << sql << std::endl;
         del(sql);
         //从对应缓存中删除相关数据
@@ -147,7 +147,7 @@ void NetizenBroker::cacheUpdate()
             //应该保证当进行插入时，数据是不可以被其他线程所更改的
             std::lock_guard<std::mutex> lk(m_mutex);
 
-            std::string sql = "update user set user_key='"+ iter->second.key()+ "', user_nickname='"+ iter->second.nickname()+ "' where user_id=" + std::to_string(iter->first);
+            std::string sql = "update user set user_key='"+ iter->second.key()+ "', user_nickname='"+ iter->second.nickname()+ "' where user_id='" + iter->first + "'";
 
             std::cout << sql << std::endl;
             update(sql);
@@ -165,13 +165,13 @@ void NetizenBroker::flush()
     cacheUpdate();
 }
 
-bool NetizenBroker::qualifyNetizenKey(long id, std::string key)
+bool NetizenBroker::qualifyNetizenKey(std::string id, std::string key)
 {
     //验证对应id的密码，正确返回true,错误返回false
     std::string sql = "select user_id, user_key from user";
     std::shared_ptr<sql::ResultSet> res = query(sql);
     while (res->next()) {
-        if (id == res->getInt(1) && key == res->getString(2))
+        if (id == res->getString(1).c_str() && key == res->getString(2))
             return true;
     }
 
@@ -185,7 +185,7 @@ void NetizenBroker::insertNewNetizen(std::shared_ptr<Netizen> netizen)
     insert(sql);
 }
 
-std::shared_ptr<Netizen> NetizenBroker::findNetizenById(long id)
+std::shared_ptr<Netizen> NetizenBroker::findNetizenById(std::string id)
 {
     //检查用户是否在缓存中
     std::shared_ptr<Netizen> netizen = inCache(id);
@@ -196,12 +196,12 @@ std::shared_ptr<Netizen> NetizenBroker::findNetizenById(long id)
     return netizen;
 }
 
-std::shared_ptr<Netizen> NetizenBroker::retrieveNetizen(const long id)
+std::shared_ptr<Netizen> NetizenBroker::retrieveNetizen(std::string id)
 {
     //查找数据库，找出用户的nickname
     std::string nickname;
 
-    std::string sql = "select user_nickname from user where user_id = " + std::to_string(id);
+    std::string sql = "select user_nickname from user where user_id = '" + id + "'";
     std::shared_ptr<sql::ResultSet> res = query(sql);
     while (res->next())
         nickname = res->getString(1).c_str();
@@ -209,15 +209,15 @@ std::shared_ptr<Netizen> NetizenBroker::retrieveNetizen(const long id)
 
     //调用Netizen(id, nickname, videosId, fansId, followersId);
     Netizen net(id,nickname, "www.cv", findNetizenVideos(id), findNetizenFans(id), findNetizenFollowers(id));
- //   std::cout << "Netizen对象实例化成功" << std::endl;
+  //  std::cout << "Netizen对象实例化成功" << std::endl;
 
-     _oldClean.insert({id,  net});   //将从数据库中获取的对象添加到缓存
+     _oldClean.insert({id,  net});   //将从数据库中获取的对象添加到旧的净缓存
     return std::make_shared<Netizen>(_oldClean.at(id));
 }
 
-std::vector<std::string> NetizenBroker::findNetizenVideos(const long id)
+std::vector<std::string> NetizenBroker::findNetizenVideos(const std::string id)
 {
-    std::string sql = "select id from video where user_id = " + std::to_string(id);
+    std::string sql = "select id from video where user_id = '" + id + "'";
     std::shared_ptr<sql::ResultSet> res = query(sql);
     std::vector<std::string> videoIds;
     while (res->next()) {
@@ -227,38 +227,38 @@ std::vector<std::string> NetizenBroker::findNetizenVideos(const long id)
     return videoIds;
 }
 
-std::vector<long> NetizenBroker::findNetizenFans(const long id)
+std::vector<std::string> NetizenBroker::findNetizenFans(const std::string id)
 {
-    std::string sql = "select fan_id from fan where user_id = " + std::to_string(id);
+    std::string sql = "select fan_id from fan where user_id = '" + id + "'";
     std::shared_ptr<sql::ResultSet> res = query(sql);
-    std::vector<long> fanIds;
+    std::vector<std::string> fanIds;
     while (res->next()) {
-        fanIds.push_back(res->getLong(1));
+        fanIds.push_back(res->getString(1).c_str());
     }
 
     return fanIds;
 }
 
-std::vector<long> NetizenBroker::findNetizenFollowers(const long id)
+std::vector<std::string> NetizenBroker::findNetizenFollowers(const std::string id)
 {
-    std::string sql = "select follower_id from follower where user_id = " + std::to_string(id);
+    std::string sql = "select follower_id from follower where user_id = '" + id + "'";
     std::shared_ptr<sql::ResultSet> res = query(sql);
-    std::vector<long> followerIds;
+    std::vector<std::string> followerIds;
     while (res->next()) {
-        followerIds.push_back(res->getLong(1));
+        followerIds.push_back(res->getString(1).c_str());
     }
 
     return followerIds;
 }
 
-void NetizenBroker::addNetizen(long id, const Netizen &netizen)
+void NetizenBroker::addNetizen(std::string id, const Netizen &netizen)
 {
     _newClean.insert({id, netizen});
 }
 
-void NetizenBroker::updateAcountInfo(long id, const Netizen &netizen)
+void NetizenBroker::updateAcountInfo(std::string id, const Netizen &netizen)
 {
-    int n = judgeFromForUpdate(id);
+    int n = judgeFrom(id);
     if (n == 0) {
         _newClean.erase(id);    //删除新的净缓存中对应的网民数据
         _newDirty.insert({id, netizen});   //添加新的网民数据到新的脏缓存中

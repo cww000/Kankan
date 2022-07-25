@@ -1,3 +1,18 @@
+// Copyright (C) Microsoft. All rights reserved. License (BSD/MIT/GPL)
+// Project: kankan-Demo
+//
+// Author: Wenwen Cheng WennCheng@163.com)
+// Date: 2022-07-25
+// Version: 0.1.0
+//
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Project description: kankan is a multimedia social platform based on video, and it is mainly for those who want to create and share, or spend their free time. It mainly provides people with the opportunity to disseminate videos and watch videos.
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//This file is part of kankan-Demo.
+// History:
+// 1.Modified by Wenwen Cheng (WennCheng@163.com) 2022-07-25
+//   Description: 主要实现查找数据库，获取数据库中视频文件的相关信息并放入对应缓存，或者添加、删除或更新数据库中该视频文件的信息
+
 #ifndef VIDEOFILEBROKER_H
 #define VIDEOFILEBROKER_H
 
